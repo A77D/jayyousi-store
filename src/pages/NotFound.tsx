@@ -52,7 +52,7 @@ const NotFound = () => {
             تواصل معنا إذا كنت تواجه مشكلة في الوصول لصفحة معينة
           </p>
           <div className="flex items-center justify-center gap-2 text-primary">
-            <span className="text-sm font-medium">052-123-4567</span>
+            <span className="text-sm font-medium">+970594321456</span>
           </div>
         </div>
       </div>

@@ -1,13 +1,15 @@
 import { Product } from '@/types/product';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart } from 'lucide-react';
+import { Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
   product: Product;
-  onOrder: (product: Product) => void;
 }
 
-export function ProductCard({ product, onOrder }: ProductCardProps) {
+export function ProductCard({ product }: ProductCardProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="card-elegant p-6 group hover:scale-105 transition-bounce">
       <div className="aspect-square mb-4 overflow-hidden rounded-lg">
@@ -32,12 +34,12 @@ export function ProductCard({ product, onOrder }: ProductCardProps) {
         </div>
         
         <Button 
-          onClick={() => onOrder(product)}
+          onClick={() => navigate(`/product/${product.id}`)}
           disabled={product.quantity === 0}
           className="w-full btn-primary group"
         >
-          <ShoppingCart className="ml-2 h-4 w-4 group-hover:scale-110 transition-smooth" />
-          {product.quantity > 0 ? 'طلب المنتج' : 'غير متوفر'}
+          <Eye className="ml-2 h-4 w-4 group-hover:scale-110 transition-smooth" />
+          {product.quantity > 0 ? 'عرض المزيد' : 'غير متوفر'}
         </Button>
       </div>
     </div>

@@ -1,53 +1,12 @@
-import { useState } from 'react';
-import { Product } from '@/types/product';
 import { products } from '@/data/products';
 import { ProductCard } from '@/components/ProductCard';
-import { OrderForm } from '@/components/OrderForm';
+import { Header } from '@/components/Header';
 import { Store, Phone, MapPin } from 'lucide-react';
 
 const Index = () => {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isOrderFormOpen, setIsOrderFormOpen] = useState(false);
-
-  const handleOrderProduct = (product: Product) => {
-    setSelectedProduct(product);
-    setIsOrderFormOpen(true);
-  };
-
-  const closeOrderForm = () => {
-    setSelectedProduct(null);
-    setIsOrderFormOpen(false);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-warm">
-      {/* Header */}
-      <header className="bg-card/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center shadow-soft">
-                <Store className="h-6 w-6 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">متجر الجيوسي</h1>
-                <p className="text-muted-foreground">منتجات عربية أصيلة</p>
-              </div>
-            </div>
-            
-            <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4" />
-                <span>052-123-4567</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                <span>القدس، فلسطين</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <section className="py-16 px-4">
@@ -56,7 +15,7 @@ const Index = () => {
             مرحباً بك في متجر الجيوسي
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            نقدم لك أجود المنتجات العربية الأصيلة من القهوة والتمور والحلويات وزيت الزيتون الطبيعي
+            نقدم لك أجود المنتجات المتنوعة من الإلكترونيات والإكسسوارات والأدوات العصرية
           </p>
           <div className="w-24 h-1 bg-gradient-primary mx-auto rounded-full"></div>
         </div>
@@ -68,7 +27,7 @@ const Index = () => {
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-foreground mb-4">منتجاتنا المميزة</h3>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              اكتشف مجموعتنا المتنوعة من المنتجات العربية الفاخرة والطبيعية
+              اكتشف مجموعتنا المتنوعة من المنتجات العصرية والعملية
             </p>
           </div>
           
@@ -77,7 +36,6 @@ const Index = () => {
               <ProductCard 
                 key={product.id} 
                 product={product} 
-                onOrder={handleOrderProduct}
               />
             ))}
           </div>
@@ -127,7 +85,7 @@ const Index = () => {
                 <h5 className="text-xl font-bold">متجر الجيوسي</h5>
               </div>
               <p className="text-background/80">
-                متجر متخصص في بيع المنتجات العربية الأصيلة والطبيعية
+                متجر متخصص في بيع المنتجات المتنوعة والعصرية
               </p>
             </div>
             
@@ -136,7 +94,7 @@ const Index = () => {
               <div className="space-y-2 text-background/80">
                 <p className="flex items-center gap-2">
                   <Phone className="h-4 w-4" />
-                  052-123-4567
+                  +970594321456
                 </p>
                 <p className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
@@ -159,13 +117,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-
-      {/* Order Form Modal */}
-      <OrderForm 
-        product={selectedProduct}
-        isOpen={isOrderFormOpen}
-        onClose={closeOrderForm}
-      />
     </div>
   );
 };

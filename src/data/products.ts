@@ -7,34 +7,34 @@ import oliveOilImage from '@/assets/olive-oil-product.jpg';
 export const products: Product[] = [
   {
     id: 1,
-    name: 'قهوة عربية فاخرة',
-    price: 25.50,
+    name: 'ساعة ذكية فاخرة',
+    price: 125.50,
     image: coffeeImage,
     quantity: 15,
-    description: 'قهوة عربية أصيلة محمصة بعناية فائقة'
+    description: 'ساعة ذكية بمواصفات عالية ومقاومة للماء'
   },
   {
     id: 2,
-    name: 'تمر مجدول ممتاز',
-    price: 35.00,
+    name: 'سماعات لاسلكية',
+    price: 85.00,
     image: datesImage,
     quantity: 8,
-    description: 'تمر مجدول طازج ولذيذ من أجود الأنواع'
+    description: 'سماعات بلوتوث عالية الجودة مع خاصية إلغاء الضوضاء'
   },
   {
     id: 3,
-    name: 'حلويات شرقية مشكلة',
-    price: 42.75,
+    name: 'حقيبة يد أنيقة',
+    price: 95.75,
     image: sweetsImage,
     quantity: 12,
-    description: 'مجموعة متنوعة من الحلويات الشرقية التقليدية'
+    description: 'حقيبة يد جلدية فاخرة بتصميم عصري'
   },
   {
     id: 4,
-    name: 'زيت زيتون بكر ممتاز',
-    price: 28.90,
+    name: 'نظارات شمسية',
+    price: 65.90,
     image: oliveOilImage,
     quantity: 20,
-    description: 'زيت زيتون طبيعي 100% عصرة أولى باردة'
+    description: 'نظارات شمسية عصرية بحماية UV400'
   }
 ];
