@@ -15,16 +15,16 @@ export function Header() {
             </div>
           </div>
           
-          <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4" />
-              <span>0501234567</span>
+            <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                <span>052-123-4567</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                <span>القدس، فلسطين</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              <span>الرياض، المملكة العربية السعودية</span>
-            </div>
-          </div>
         </div>
       </div>
     </header>

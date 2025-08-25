@@ -26,7 +26,7 @@ export function ProductCard({ product, onOrder }: ProductCardProps) {
         
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <p className="text-2xl font-bold text-primary">{product.price.toFixed(2)} ر.س</p>
+            <p className="text-2xl font-bold text-primary">{product.price.toFixed(2)} ₪</p>
             <p className="text-sm text-muted-foreground">متوفر: {product.quantity} قطعة</p>
           </div>
         </div>

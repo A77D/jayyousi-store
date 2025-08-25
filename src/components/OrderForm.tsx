@@ -122,7 +122,7 @@ export function OrderForm({ product, isOpen, onClose }: OrderFormProps) {
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">{product.name}</h3>
                 <p className="text-muted-foreground">{product.description}</p>
-                <p className="text-primary font-bold">{product.price.toFixed(2)} ر.س</p>
+                <p className="text-primary font-bold">{product.price.toFixed(2)} ₪</p>
               </div>
             </div>
           </div>
@@ -156,7 +156,7 @@ export function OrderForm({ product, isOpen, onClose }: OrderFormProps) {
               <Input
                 required
                 type="tel"
-                placeholder="05xxxxxxxx"
+                placeholder="052-xxx-xxxx"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
                 className="input-elegant"
@@ -207,7 +207,7 @@ export function OrderForm({ product, isOpen, onClose }: OrderFormProps) {
               <div className="flex justify-between items-center">
                 <span className="text-lg font-medium">المجموع:</span>
                 <span className="text-2xl font-bold text-primary">
-                  {totalPrice.toFixed(2)} ر.س
+                  {totalPrice.toFixed(2)} ₪
                 </span>
               </div>
             </div>

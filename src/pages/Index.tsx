@@ -38,11 +38,11 @@ const Index = () => {
             <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4" />
-                <span>0501234567</span>
+                <span>052-123-4567</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                <span>الرياض، المملكة العربية السعودية</span>
+                <span>القدس، فلسطين</span>
               </div>
             </div>
           </div>
@@ -136,11 +136,11 @@ const Index = () => {
               <div className="space-y-2 text-background/80">
                 <p className="flex items-center gap-2">
                   <Phone className="h-4 w-4" />
-                  0501234567
+                  052-123-4567
                 </p>
                 <p className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  الرياض، السعودية
+                  القدس، فلسطين
                 </p>
               </div>
             </div>
