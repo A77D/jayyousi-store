@@ -1,9 +1,12 @@
-import { products } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
 import { ProductCard } from '@/components/ProductCard';
 import { Header } from '@/components/Header';
-import { Store, Phone, MapPin } from 'lucide-react';
+import { Store, Phone, MapPin, Loader2, Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Index = () => {
+  const { products, loading } = useProducts();
+
   return (
     <div className="min-h-screen bg-gradient-warm">
       <Header />
@@ -31,14 +34,20 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-              />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {products.map((product) => (
+                <ProductCard 
+                  key={product.id} 
+                  product={product} 
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -113,7 +122,16 @@ const Index = () => {
           </div>
           
           <div className="border-t border-background/20 mt-8 pt-8 text-center text-background/60">
-            <p>&copy; 2024 متجر الجيوسي. جميع الحقوق محفوظة.</p>
+            <div className="flex items-center justify-center gap-4 mb-2">
+              <p>&copy; 2024 متجر الجيوسي. جميع الحقوق محفوظة.</p>
+              <Link 
+                to="/admin/login" 
+                className="flex items-center gap-1 text-xs opacity-50 hover:opacity-80 transition-opacity"
+              >
+                <Shield className="h-3 w-3" />
+                إدارة
+              </Link>
+            </div>
           </div>
         </div>
       </footer>

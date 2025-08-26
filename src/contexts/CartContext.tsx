@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { Product } from '@/types/product';
+import { Product } from '@/hooks/useProducts';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface CartItem {
   product: Product;
@@ -14,8 +15,8 @@ interface CartState {
 
 type CartAction = 
   | { type: 'ADD_ITEM'; payload: { product: Product; quantity: number } }
-  | { type: 'REMOVE_ITEM'; payload: { productId: number } }
-  | { type: 'UPDATE_QUANTITY'; payload: { productId: number; quantity: number } }
+  | { type: 'REMOVE_ITEM'; payload: { productId: string } }
+  | { type: 'UPDATE_QUANTITY'; payload: { productId: string; quantity: number } }
   | { type: 'CLEAR_CART' };
 
 const initialState: CartState = {
@@ -83,9 +84,10 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 
 interface CartContextType extends CartState {
   addItem: (product: Product, quantity: number) => void;
-  removeItem: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  removeItem: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
+  submitOrder: (customerInfo: any) => Promise<{ success: boolean; error?: string }>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -97,16 +99,57 @@ export function CartProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'ADD_ITEM', payload: { product, quantity } });
   };
   
-  const removeItem = (productId: number) => {
+  const removeItem = (productId: string) => {
     dispatch({ type: 'REMOVE_ITEM', payload: { productId } });
   };
   
-  const updateQuantity = (productId: number, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number) => {
     dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } });
   };
   
   const clearCart = () => {
     dispatch({ type: 'CLEAR_CART' });
+  };
+
+  const submitOrder = async (customerInfo: any) => {
+    try {
+      // Create order
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert([{
+          full_name: customerInfo.fullName,
+          phone_number: customerInfo.phoneNumber,
+          address: customerInfo.address,
+          notes: customerInfo.notes,
+          total_price: state.totalPrice,
+          status: 'pending'
+        }])
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      // Create order items
+      const orderItems = state.items.map(item => ({
+        order_id: order.id,
+        product_id: item.product.id,
+        quantity: item.quantity,
+        price: item.product.price
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      return { success: true };
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'حدث خطأ غير متوقع' 
+      };
+    }
   };
   
   return (
@@ -116,6 +159,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem,
       updateQuantity,
       clearCart,
+      submitOrder,
     }}>
       {children}
     </CartContext.Provider>

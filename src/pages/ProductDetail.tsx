@@ -1,13 +1,13 @@
-import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { products } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowRight, ShoppingCart, Plus, Minus } from 'lucide-react';
+import { ArrowRight, Minus, Plus, ShoppingCart, Loader2 } from 'lucide-react';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -15,19 +15,40 @@ const ProductDetail = () => {
   const { addItem } = useCart();
   const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
+  const { products, loading } = useProducts();
   
-  const product = products.find(p => p.id === parseInt(id || '0'));
+  const product = products.find(p => p.id === id);
   
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-warm">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className="min-h-screen bg-gradient-warm">
         <Header />
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">المنتج غير موجود</h2>
-          <Button onClick={() => navigate('/')} variant="outline">
+        <div className="container mx-auto px-4 py-8">
+          <Button 
+            onClick={() => navigate('/')} 
+            variant="ghost" 
+            className="mb-6"
+          >
             <ArrowRight className="ml-2 h-4 w-4" />
             العودة للرئيسية
           </Button>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-foreground mb-4">المنتج غير موجود</h2>
+            <p className="text-muted-foreground">هذا المنتج غير متوفر أو تم حذفه</p>
+          </div>
         </div>
       </div>
     );

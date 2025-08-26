@@ -18,7 +18,7 @@ interface CheckoutForm {
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice, clearCart, submitOrder } = useCart();
   const { toast } = useToast();
   
   const [formData, setFormData] = useState<CheckoutForm>({
@@ -33,34 +33,25 @@ const Checkout = () => {
     return null;
   }
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Create order data
-    const orderData = {
-      items: items.map(item => ({
-        productName: item.product.name,
-        quantity: item.quantity,
-        price: item.product.price,
-        total: item.product.price * item.quantity
-      })),
-      customerInfo: formData,
-      totalAmount: totalPrice,
-      orderDate: new Date().toISOString(),
-    };
+    const result = await submitOrder(formData);
     
-    // Log order (in real app, send to backend)
-    console.log('طلب جديد:', orderData);
-    
-    // Show success message
-    toast({
-      title: "تم إرسال الطلب بنجاح",
-      description: "سيتم التواصل معك قريباً لتأكيد الطلب",
-    });
-    
-    // Clear cart and redirect
-    clearCart();
-    navigate('/');
+    if (result.success) {
+      toast({
+        title: "تم إرسال الطلب بنجاح",
+        description: "سيتم التواصل معك قريباً لتأكيد الطلب",
+      });
+      clearCart();
+      navigate('/');
+    } else {
+      toast({
+        title: "خطأ في إرسال الطلب",
+        description: result.error || "حدث خطأ غير متوقع",
+        variant: "destructive"
+      });
+    }
   };
   
   return (
