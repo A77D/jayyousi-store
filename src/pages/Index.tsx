@@ -107,7 +107,7 @@ const Index = () => {
                 </p>
                 <p className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  القدس، فلسطين
+                  فلسطين
                 </p>
               </div>
             </div>

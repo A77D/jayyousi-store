@@ -5,16 +5,24 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowRight, MapPin, Phone, User, MessageCircle } from 'lucide-react';
+import { ArrowRight, MapPin, Phone, User, MessageCircle, Truck } from 'lucide-react';
 
 interface CheckoutForm {
   fullName: string;
   phoneNumber: string;
   address: string;
   notes: string;
+  deliveryZone: string;
 }
+
+const deliveryZones = [
+  { id: 'west-bank', name: 'الضفة الغربية', price: 20 },
+  { id: 'jerusalem', name: 'القدس', price: 50 },
+  { id: 'interior', name: 'الداخل المحتل', price: 70 }
+];
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -26,7 +34,12 @@ const Checkout = () => {
     phoneNumber: '',
     address: '',
     notes: '',
+    deliveryZone: '',
   });
+  
+  const selectedDeliveryZone = deliveryZones.find(zone => zone.id === formData.deliveryZone);
+  const deliveryPrice = selectedDeliveryZone?.price || 0;
+  const finalTotal = totalPrice + deliveryPrice;
   
   if (items.length === 0) {
     navigate('/cart');
@@ -106,9 +119,32 @@ const Checkout = () => {
               </div>
               
               <div className="space-y-2">
+                <Label htmlFor="deliveryZone" className="flex items-center gap-2">
+                  <Truck className="h-4 w-4" />
+                  منطقة التوصيل
+                </Label>
+                <Select 
+                  value={formData.deliveryZone}
+                  onValueChange={(value) => setFormData({...formData, deliveryZone: value})}
+                  required
+                >
+                  <SelectTrigger className="input-elegant">
+                    <SelectValue placeholder="اختر منطقة التوصيل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {deliveryZones.map((zone) => (
+                      <SelectItem key={zone.id} value={zone.id}>
+                        {zone.name} - {zone.price} ₪
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="address" className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  عنوان التوصيل
+                  عنوان التوصيل التفصيلي
                 </Label>
                 <Textarea
                   id="address"
@@ -179,13 +215,15 @@ const Checkout = () => {
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span>رسوم التوصيل:</span>
-                  <span className="text-green-600">مجاني</span>
+                  <span className={deliveryPrice > 0 ? "text-primary font-medium" : "text-green-600"}>
+                    {deliveryPrice > 0 ? `${deliveryPrice.toFixed(2)} ₪` : 'اختر المنطقة'}
+                  </span>
                 </div>
                 <div className="border-t border-border pt-2">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold">المجموع الكلي:</span>
                     <span className="text-2xl font-bold text-primary">
-                      {totalPrice.toFixed(2)} ₪
+                      {finalTotal.toFixed(2)} ₪
                     </span>
                   </div>
                 </div>

@@ -113,15 +113,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const submitOrder = async (customerInfo: any) => {
     try {
+      // Calculate delivery price
+      const deliveryZones = [
+        { id: 'west-bank', name: 'الضفة الغربية', price: 20 },
+        { id: 'jerusalem', name: 'القدس', price: 50 },
+        { id: 'interior', name: 'الداخل المحتل', price: 70 }
+      ];
+      
+      const selectedZone = deliveryZones.find(zone => zone.id === customerInfo.deliveryZone);
+      const deliveryPrice = selectedZone?.price || 0;
+      const finalTotal = state.totalPrice + deliveryPrice;
+      
       // Create order
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert([{
           full_name: customerInfo.fullName,
           phone_number: customerInfo.phoneNumber,
-          address: customerInfo.address,
+          address: `${selectedZone?.name || ''} - ${customerInfo.address}`,
           notes: customerInfo.notes,
-          total_price: state.totalPrice,
+          total_price: finalTotal,
           status: 'pending'
         }])
         .select()
