@@ -6,30 +6,44 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Lock, User } from 'lucide-react';
+import { Lock, Mail } from 'lucide-react';
 
 const AdminLogin = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAdmin();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    if (login(username, password)) {
+    try {
+      const success = await login(email, password);
+      
+      if (success) {
+        toast({
+          title: "تم تسجيل الدخول بنجاح",
+          description: "مرحباً بك في لوحة التحكم",
+        });
+        navigate('/admin');
+      } else {
+        toast({
+          title: "خطأ في تسجيل الدخول",
+          description: "البريد الإلكتروني أو كلمة المرور غير صحيحة، أو ليس لديك صلاحية إدارية",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
       toast({
-        title: "تم تسجيل الدخول بنجاح",
-        description: "مرحباً بك في لوحة التحكم",
+        title: "خطأ في الاتصال",
+        description: "حدث خطأ أثناء تسجيل الدخول، يرجى المحاولة مرة أخرى",
+        variant: "destructive",
       });
-      navigate('/admin');
-    } else {
-      toast({
-        title: "خطأ في تسجيل الدخول",
-        description: "اسم المستخدم أو كلمة المرور غير صحيحة",
-        variant: "destructive"
-      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -43,17 +57,17 @@ const AdminLogin = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                اسم المستخدم
+              <Label htmlFor="email" className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                البريد الإلكتروني
               </Label>
               <Input
-                id="username"
-                type="text"
+                id="email"
+                type="email"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="أدخل اسم المستخدم"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@example.com"
               />
             </div>
             
@@ -72,8 +86,8 @@ const AdminLogin = () => {
               />
             </div>
             
-            <Button type="submit" className="w-full">
-              تسجيل الدخول
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
             </Button>
           </form>
         </CardContent>
