@@ -8,6 +8,8 @@ export interface Product {
   image: string;
   quantity: number;
   description?: string;
+  short_description?: string;
+  long_description?: string;
 }
 
 export function useProducts() {

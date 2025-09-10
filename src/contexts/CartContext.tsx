@@ -87,7 +87,7 @@ interface CartContextType extends CartState {
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  submitOrder: (customerInfo: any) => Promise<{ success: boolean; error?: string }>;
+  submitOrder: (customerInfo: any) => Promise<{ success: boolean; error?: string; orderId?: string }>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -154,7 +154,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       if (itemsError) throw itemsError;
 
-      return { success: true };
+      return { success: true, orderId: order.id };
     } catch (error) {
       return { 
         success: false, 

@@ -22,8 +22,8 @@ export function ProductCard({ product }: ProductCardProps) {
       
       <div className="space-y-3">
         <h3 className="text-xl font-semibold text-foreground">{product.name}</h3>
-        {product.description && (
-          <p className="text-muted-foreground text-sm">{product.description}</p>
+        {product.short_description && (
+          <p className="text-muted-foreground text-sm">{product.short_description}</p>
         )}
         
         <div className="flex items-center justify-between">

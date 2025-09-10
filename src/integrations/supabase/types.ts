@@ -98,9 +98,11 @@ export type Database = {
           description: string | null
           id: string
           image: string
+          long_description: string | null
           name: string
           price: number
           quantity: number
+          short_description: string | null
           updated_at: string
         }
         Insert: {
@@ -108,9 +110,11 @@ export type Database = {
           description?: string | null
           id?: string
           image: string
+          long_description?: string | null
           name: string
           price: number
           quantity?: number
+          short_description?: string | null
           updated_at?: string
         }
         Update: {
@@ -118,9 +122,11 @@ export type Database = {
           description?: string | null
           id?: string
           image?: string
+          long_description?: string | null
           name?: string
           price?: number
           quantity?: number
+          short_description?: string | null
           updated_at?: string
         }
         Relationships: []

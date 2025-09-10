@@ -121,7 +121,7 @@ const ProductDetail = () => {
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">{product.name}</h1>
-              <p className="text-muted-foreground text-lg">{product.description}</p>
+              <p className="text-muted-foreground text-lg">{product.long_description || product.short_description}</p>
             </div>
             
             <div className="flex items-center gap-4">

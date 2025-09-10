@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useProducts } from '@/hooks/useProducts';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Upload, Image } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Table,
   TableBody,
@@ -22,7 +23,8 @@ interface ProductForm {
   price: string;
   image: string;
   quantity: string;
-  description: string;
+  short_description: string;
+  long_description: string;
 }
 
 export function ProductManagement() {
@@ -30,12 +32,15 @@ export function ProductManagement() {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<ProductForm>({
     name: '',
     price: '',
     image: '',
     quantity: '',
-    description: ''
+    short_description: '',
+    long_description: ''
   });
 
   const resetForm = () => {
@@ -44,9 +49,48 @@ export function ProductManagement() {
       price: '',
       image: '',
       quantity: '',
-      description: ''
+      short_description: '',
+      long_description: ''
     });
     setEditingProduct(null);
+  };
+
+  const handleImageUpload = async (file: File) => {
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `products/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, image: data.publicUrl });
+
+      toast({
+        title: "تم رفع الصورة بنجاح",
+        description: "تم حفظ الصورة وإضافتها للمنتج",
+      });
+    } catch (error: any) {
+      toast({
+        title: "خطأ في رفع الصورة",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,7 +101,8 @@ export function ProductManagement() {
       price: parseFloat(formData.price),
       image: formData.image,
       quantity: parseInt(formData.quantity),
-      description: formData.description
+      short_description: formData.short_description,
+      long_description: formData.long_description
     };
 
     let result;
@@ -89,7 +134,8 @@ export function ProductManagement() {
       price: product.price.toString(),
       image: product.image,
       quantity: product.quantity.toString(),
-      description: product.description || ''
+      short_description: product.short_description || '',
+      long_description: product.long_description || ''
     });
     setEditingProduct(product.id);
     setIsDialogOpen(true);
@@ -133,7 +179,7 @@ export function ProductManagement() {
                 إضافة منتج جديد
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
                   {editingProduct ? 'تعديل المنتج' : 'إضافة منتج جديد'}
@@ -163,14 +209,58 @@ export function ProductManagement() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="image">رابط الصورة</Label>
-                  <Input
-                    id="image"
-                    type="url"
-                    required
-                    value={formData.image}
-                    onChange={(e) => setFormData({...formData, image: e.target.value})}
-                  />
+                  <Label>صورة المنتج</Label>
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="flex-1"
+                      >
+                        {uploading ? (
+                          <>
+                            <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                            جاري الرفع...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="ml-2 h-4 w-4" />
+                            رفع صورة
+                          </>
+                        )}
+                      </Button>
+                      <Input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleImageUpload(file);
+                        }}
+                        className="hidden"
+                      />
+                    </div>
+                    <div className="text-center text-sm text-muted-foreground">أو</div>
+                    <Input
+                      placeholder="رابط الصورة"
+                      value={formData.image}
+                      onChange={(e) => setFormData({...formData, image: e.target.value})}
+                    />
+                    {formData.image && (
+                      <div className="w-full h-32 overflow-hidden rounded-lg bg-muted">
+                        <img 
+                          src={formData.image} 
+                          alt="معاينة المنتج"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
@@ -185,11 +275,24 @@ export function ProductManagement() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="description">الوصف</Label>
+                  <Label htmlFor="short_description">الوصف المختصر (يظهر في الصفحة الرئيسية)</Label>
                   <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    id="short_description"
+                    placeholder="وصف قصير يلخص المنتج في سطر أو سطرين"
+                    value={formData.short_description}
+                    onChange={(e) => setFormData({...formData, short_description: e.target.value})}
+                    rows={2}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="long_description">الوصف التفصيلي (يظهر في صفحة المنتج)</Label>
+                  <Textarea
+                    id="long_description"
+                    placeholder="وصف مفصل عن المنتج، مميزاته، واستخداماته"
+                    value={formData.long_description}
+                    onChange={(e) => setFormData({...formData, long_description: e.target.value})}
+                    rows={4}
                   />
                 </div>
                 

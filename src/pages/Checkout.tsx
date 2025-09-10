@@ -57,7 +57,7 @@ const Checkout = () => {
         description: "سيتم التواصل معك قريباً لتأكيد الطلب",
       });
       clearCart();
-      navigate('/');
+      navigate(`/thank-you?order=${result.orderId || Math.random().toString(36).substr(2, 9)}`);
     } else {
       toast({
         title: "خطأ في إرسال الطلب",
