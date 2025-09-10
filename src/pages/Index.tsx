@@ -1,8 +1,9 @@
 import { useProducts } from '@/hooks/useProducts';
 import { ProductCard } from '@/components/ProductCard';
 import { Header } from '@/components/Header';
-import { Store, Phone, MapPin, Loader2, Shield } from 'lucide-react';
+import { Store, Phone, MapPin, Loader2, Shield, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 const Index = () => {
   const {
     products,
@@ -20,7 +21,15 @@ const Index = () => {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             نقدم لك أجود المنتجات المتنوعة من الإلكترونيات والإكسسوارات والأدوات العصرية
           </p>
-          <div className="w-24 h-1 bg-gradient-primary mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-gradient-primary mx-auto rounded-full mb-8"></div>
+          <div className="flex justify-center">
+            <Link to="/auth">
+              <Button size="lg" className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                تسجيل الدخول / إنشاء حساب
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

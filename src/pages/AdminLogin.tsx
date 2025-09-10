@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Lock, Mail } from 'lucide-react';
+import { Lock, Mail, ArrowRight } from 'lucide-react';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -49,6 +49,12 @@ const AdminLogin = () => {
 
   return (
     <div className="min-h-screen bg-gradient-warm flex items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <Button variant="outline" size="sm" onClick={() => navigate('/')}>
+          <ArrowRight className="h-4 w-4 ml-2" />
+          العودة للرئيسية
+        </Button>
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">دخول الأدمن</CardTitle>
