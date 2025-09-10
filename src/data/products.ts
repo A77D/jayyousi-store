@@ -6,7 +6,7 @@ import oliveOilImage from '@/assets/olive-oil-product.jpg';
 
 export const products: Product[] = [
   {
-    id: 1,
+    id: "1",
     name: 'ساعة ذكية فاخرة',
     price: 125.50,
     image: coffeeImage,
@@ -14,7 +14,7 @@ export const products: Product[] = [
     description: 'ساعة ذكية بمواصفات عالية ومقاومة للماء'
   },
   {
-    id: 2,
+    id: "2",
     name: 'سماعات لاسلكية',
     price: 85.00,
     image: datesImage,
@@ -22,7 +22,7 @@ export const products: Product[] = [
     description: 'سماعات بلوتوث عالية الجودة مع خاصية إلغاء الضوضاء'
   },
   {
-    id: 3,
+    id: "3",
     name: 'حقيبة يد أنيقة',
     price: 95.75,
     image: sweetsImage,
@@ -30,7 +30,7 @@ export const products: Product[] = [
     description: 'حقيبة يد جلدية فاخرة بتصميم عصري'
   },
   {
-    id: 4,
+    id: "4",
     name: 'نظارات شمسية',
     price: 65.90,
     image: oliveOilImage,

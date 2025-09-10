@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import type { ProductMedia } from '@/types/product';
 
 export interface Product {
   id: string;
@@ -10,6 +11,7 @@ export interface Product {
   description?: string;
   short_description?: string;
   long_description?: string;
+  media?: ProductMedia[];
 }
 
 export function useProducts() {
@@ -22,11 +24,30 @@ export function useProducts() {
       setLoading(true);
       const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select(`
+          *,
+          media:product_media(
+            id,
+            product_id,
+            media_url,
+            media_type,
+            display_order
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setProducts(data || []);
+      
+      // Transform the data to ensure proper typing
+      const transformedData = (data || []).map(product => ({
+        ...product,
+        media: (product.media || []).map(m => ({
+          ...m,
+          media_type: m.media_type as 'image' | 'video'
+        }))
+      }));
+      
+      setProducts(transformedData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'حدث خطأ غير متوقع');
     } finally {
@@ -95,6 +116,46 @@ export function useProducts() {
     }
   };
 
+  const addProductMedia = async (productId: string, mediaUrl: string, mediaType: 'image' | 'video', displayOrder: number = 0) => {
+    try {
+      const { data, error } = await supabase
+        .from('product_media')
+        .insert([{
+          product_id: productId,
+          media_url: mediaUrl,
+          media_type: mediaType,
+          display_order: displayOrder
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { success: true, data };
+    } catch (err) {
+      return { 
+        success: false, 
+        error: err instanceof Error ? err.message : 'حدث خطأ غير متوقع' 
+      };
+    }
+  };
+
+  const deleteProductMedia = async (mediaId: string) => {
+    try {
+      const { error } = await supabase
+        .from('product_media')
+        .delete()
+        .eq('id', mediaId);
+
+      if (error) throw error;
+      return { success: true };
+    } catch (err) {
+      return { 
+        success: false, 
+        error: err instanceof Error ? err.message : 'حدث خطأ غير متوقع' 
+      };
+    }
+  };
+
   return {
     products,
     loading,
@@ -102,6 +163,8 @@ export function useProducts() {
     fetchProducts,
     addProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    addProductMedia,
+    deleteProductMedia
   };
 }

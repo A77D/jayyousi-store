@@ -83,7 +83,7 @@ const ProductDetail = () => {
         </Button>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Product Images */}
+          {/* Product Images and Videos */}
           <div className="space-y-4">
             <div className="aspect-square overflow-hidden rounded-lg bg-background">
               <img 
@@ -93,28 +93,51 @@ const ProductDetail = () => {
               />
             </div>
             
-            {/* Additional Images Grid */}
-            <div className="grid grid-cols-3 gap-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="aspect-square overflow-hidden rounded-lg bg-muted">
-                  <img 
-                    src={product.image} 
-                    alt={`${product.name} - صورة ${i}`}
-                    className="w-full h-full object-cover opacity-70"
-                  />
+            {/* Media Gallery */}
+            {product.media && product.media.length > 0 ? (
+              <div className="space-y-4">
+                <h3 className="font-semibold text-foreground">معرض الصور والفيديوهات</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {product.media
+                    .sort((a, b) => a.display_order - b.display_order)
+                    .map((media, index) => (
+                      <div key={media.id || index} className="aspect-square overflow-hidden rounded-lg bg-muted">
+                        {media.media_type === 'image' ? (
+                          <img 
+                            src={media.media_url} 
+                            alt={`${product.name} - صورة ${index + 1}`}
+                            className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => {
+                              // Open image in a new tab or lightbox
+                              window.open(media.media_url, '_blank');
+                            }}
+                          />
+                        ) : (
+                          <video 
+                            src={media.media_url}
+                            className="w-full h-full object-cover cursor-pointer"
+                            controls
+                            preload="metadata"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        )}
+                      </div>
+                    ))}
                 </div>
-              ))}
-            </div>
-            
-            {/* Video Placeholder */}
-            <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <div className="w-0 h-0 border-l-[8px] border-l-primary border-y-[6px] border-y-transparent mr-1"></div>
-                </div>
-                <p className="text-muted-foreground text-sm">فيديو المنتج</p>
               </div>
-            </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="aspect-square overflow-hidden rounded-lg bg-muted">
+                    <img 
+                      src={product.image} 
+                      alt={`${product.name} - صورة ${i}`}
+                      className="w-full h-full object-cover opacity-70"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           
           {/* Product Details */}
