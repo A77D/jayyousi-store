@@ -1,14 +1,44 @@
 import { useProducts } from '@/hooks/useProducts';
 import { ProductCard } from '@/components/ProductCard';
 import { Header } from '@/components/Header';
-import { Store, Phone, MapPin, Loader2, Shield, User } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Store, Phone, MapPin, Loader2, Shield, User, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useEffect, useState } from 'react';
+import { User as SupabaseUser } from '@supabase/supabase-js';
+import { useToast } from '@/hooks/use-toast';
 const Index = () => {
   const {
     products,
     loading
   } = useProducts();
+  
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "تم تسجيل الخروج بنجاح",
+      description: "نراك قريباً!",
+    });
+  };
   return <div className="min-h-screen bg-gradient-warm">
       <Header />
 
@@ -23,12 +53,19 @@ const Index = () => {
           </p>
           <div className="w-24 h-1 bg-gradient-primary mx-auto rounded-full mb-8"></div>
           <div className="flex justify-center">
-            <Link to="/auth">
-              <Button size="lg" className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                تسجيل الدخول / إنشاء حساب
+            {user ? (
+              <Button size="lg" onClick={handleSignOut} variant="outline" className="flex items-center gap-2">
+                <LogOut className="h-5 w-5" />
+                تسجيل الخروج
               </Button>
-            </Link>
+            ) : (
+              <Link to="/auth">
+                <Button size="lg" className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  تسجيل الدخول / إنشاء حساب
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </section>
