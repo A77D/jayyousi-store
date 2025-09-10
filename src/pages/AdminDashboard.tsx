@@ -73,10 +73,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleOrderDeleted = (orderId: string) => {
-    setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
-  };
-
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -152,12 +148,7 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="orders">
-            <OrdersTable 
-              orders={orders} 
-              loading={loading} 
-              onRefresh={fetchOrders} 
-              onOrderDeleted={handleOrderDeleted}
-            />
+            <OrdersTable orders={orders} loading={loading} onRefresh={fetchOrders} />
           </TabsContent>
         </Tabs>
       </div>
