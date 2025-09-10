@@ -2,8 +2,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, RefreshCw, Eye } from 'lucide-react';
+import { Loader2, RefreshCw, Eye, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import {
   Table,
   TableBody,
@@ -36,10 +39,41 @@ interface OrdersTableProps {
   orders: Order[];
   loading: boolean;
   onRefresh: () => void;
+  onOrderDeleted: (orderId: string) => void;
 }
 
-export function OrdersTable({ orders, loading, onRefresh }: OrdersTableProps) {
+export function OrdersTable({ orders, loading, onRefresh, onOrderDeleted }: OrdersTableProps) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [deletingOrder, setDeletingOrder] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleDeleteOrder = async (orderId: string) => {
+    try {
+      setDeletingOrder(orderId);
+      
+      // Delete the order (order_items will be deleted automatically due to CASCADE)
+      const { error } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      onOrderDeleted(orderId);
+      toast({
+        title: "تم حذف الطلب",
+        description: "تم حذف الطلب وجميع تفاصيله بنجاح"
+      });
+    } catch (error: any) {
+      toast({
+        title: "خطأ في حذف الطلب",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setDeletingOrder(null);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -110,16 +144,17 @@ export function OrdersTable({ orders, loading, onRefresh }: OrdersTableProps) {
                 <TableCell>{getStatusBadge(order.status)}</TableCell>
                 <TableCell>{formatDate(order.created_at)}</TableCell>
                 <TableCell>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setSelectedOrder(order)}
-                      >
-                        <Eye className="h-3 w-3" />
-                      </Button>
-                    </DialogTrigger>
+                  <div className="flex gap-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedOrder(order)}
+                        >
+                          <Eye className="h-3 w-3" />
+                        </Button>
+                      </DialogTrigger>
                     <DialogContent className="max-w-2xl">
                       <DialogHeader>
                         <DialogTitle>تفاصيل الطلب #{selectedOrder?.id.slice(-8)}</DialogTitle>
@@ -176,7 +211,42 @@ export function OrdersTable({ orders, loading, onRefresh }: OrdersTableProps) {
                         </div>
                       )}
                     </DialogContent>
-                  </Dialog>
+                    </Dialog>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          disabled={deletingOrder === order.id}
+                        >
+                          {deletingOrder === order.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            سيتم حذف الطلب #{order.id.slice(-8)} نهائياً. لا يمكن التراجع عن هذا الإجراء.
+                            سيتم حذف جميع تفاصيل الطلب والمنتجات المرتبطة به.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteOrder(order.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            حذف الطلب
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
