@@ -124,7 +124,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const deliveryPrice = selectedZone?.price || 0;
       const finalTotal = state.totalPrice + deliveryPrice;
       
-      // Create order
+      // Get current user ID if authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Create order with user_id if authenticated
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert([{
@@ -133,7 +136,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           address: `${selectedZone?.name || ''} - ${customerInfo.address}`,
           notes: customerInfo.notes,
           total_price: finalTotal,
-          status: 'pending'
+          status: 'pending',
+          user_id: user?.id || null
         }])
         .select()
         .single();

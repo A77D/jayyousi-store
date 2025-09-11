@@ -73,6 +73,30 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteOrder = async (orderId: string) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      toast({
+        title: "تم حذف الطلب",
+        description: "تم حذف الطلب بنجاح"
+      });
+      
+      fetchOrders(); // Refresh the orders list
+    } catch (err) {
+      toast({
+        title: "خطأ في حذف الطلب",
+        description: err instanceof Error ? err.message : 'حدث خطأ غير متوقع',
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -148,7 +172,7 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="orders">
-            <OrdersTable orders={orders} loading={loading} onRefresh={fetchOrders} />
+            <OrdersTable orders={orders} loading={loading} onRefresh={fetchOrders} onDelete={handleDeleteOrder} />
           </TabsContent>
         </Tabs>
       </div>

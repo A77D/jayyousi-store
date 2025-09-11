@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, RefreshCw, Eye } from 'lucide-react';
+import { Loader2, RefreshCw, Eye, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import {
   Table,
   TableBody,
@@ -36,9 +37,10 @@ interface OrdersTableProps {
   orders: Order[];
   loading: boolean;
   onRefresh: () => void;
+  onDelete: (orderId: string) => Promise<void>;
 }
 
-export function OrdersTable({ orders, loading, onRefresh }: OrdersTableProps) {
+export function OrdersTable({ orders, loading, onRefresh, onDelete }: OrdersTableProps) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   const getStatusBadge = (status: string) => {
@@ -110,16 +112,17 @@ export function OrdersTable({ orders, loading, onRefresh }: OrdersTableProps) {
                 <TableCell>{getStatusBadge(order.status)}</TableCell>
                 <TableCell>{formatDate(order.created_at)}</TableCell>
                 <TableCell>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setSelectedOrder(order)}
-                      >
-                        <Eye className="h-3 w-3" />
-                      </Button>
-                    </DialogTrigger>
+                  <div className="flex gap-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedOrder(order)}
+                        >
+                          <Eye className="h-3 w-3" />
+                        </Button>
+                      </DialogTrigger>
                     <DialogContent className="max-w-2xl">
                       <DialogHeader>
                         <DialogTitle>تفاصيل الطلب #{selectedOrder?.id.slice(-8)}</DialogTitle>
@@ -177,6 +180,34 @@ export function OrdersTable({ orders, loading, onRefresh }: OrdersTableProps) {
                       )}
                     </DialogContent>
                   </Dialog>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>حذف الطلب</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          هل أنت متأكد من حذف هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.
+                          <br />
+                          رقم الطلب: #{order.id.slice(-8)}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => onDelete(order.id)}>
+                          حذف
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
