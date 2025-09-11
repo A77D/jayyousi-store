@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/contexts/CartContext';
@@ -8,6 +9,7 @@ import { ArrowRight, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
 const Cart = () => {
   const navigate = useNavigate();
   const { items, totalPrice, updateQuantity, removeItem, clearCart } = useCart();
+  const { t } = useLanguage();
   
   if (items.length === 0) {
     return (
@@ -18,11 +20,11 @@ const Cart = () => {
             <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
               <ShoppingBag className="h-12 w-12 text-muted-foreground" />
             </div>
-            <h2 className="text-2xl font-bold text-foreground mb-4">السلة فارغة</h2>
-            <p className="text-muted-foreground mb-6">لم تقم بإضافة أي منتجات إلى السلة بعد</p>
+            <h2 className="text-2xl font-bold text-foreground mb-4">{t('cart.empty')}</h2>
+            <p className="text-muted-foreground mb-6">{t('cart.empty.message')}</p>
             <Button onClick={() => navigate('/')} className="btn-primary">
               <ArrowRight className="ml-2 h-4 w-4" />
-              تسوق الآن
+              {t('shop.now')}
             </Button>
           </div>
         </div>
@@ -41,21 +43,21 @@ const Cart = () => {
             variant="ghost"
           >
             <ArrowRight className="ml-2 h-4 w-4" />
-            متابعة التسوق
+            {t('continue.shopping')}
           </Button>
           <Button 
             onClick={clearCart} 
             variant="outline"
           >
             <Trash2 className="ml-2 h-4 w-4" />
-            إفراغ السلة
+            {t('clear.cart')}
           </Button>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-2xl font-bold text-foreground">سلة التسوق</h2>
+            <h2 className="text-2xl font-bold text-foreground">{t('shopping.cart')}</h2>
             
             {items.map((item) => (
               <div key={item.product.id} className="card-elegant p-4">
@@ -122,7 +124,7 @@ const Cart = () => {
           {/* Order Summary */}
           <div className="space-y-4">
             <div className="card-elegant p-6 sticky top-4">
-              <h3 className="text-xl font-bold text-foreground mb-4">ملخص الطلب</h3>
+              <h3 className="text-xl font-bold text-foreground mb-4">{t('order.summary')}</h3>
               
               <div className="space-y-3 mb-6">
                 {items.map((item) => (
@@ -135,7 +137,7 @@ const Cart = () => {
               
               <div className="border-t border-border pt-4 mb-6">
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold">المجموع الكلي:</span>
+                  <span className="text-lg font-bold">{t('grand.total')}:</span>
                   <span className="text-2xl font-bold text-primary">
                     {totalPrice.toFixed(2)} ₪
                   </span>
@@ -147,7 +149,7 @@ const Cart = () => {
                 className="w-full btn-primary"
                 size="lg"
               >
-                إتمام الطلب
+                {t('checkout')}
               </Button>
             </div>
           </div>

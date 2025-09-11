@@ -1,13 +1,15 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProducts } from '@/hooks/useProducts';
 import { Header } from '@/components/Header';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useCart } from '@/contexts/CartContext';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowRight, Minus, Plus, ShoppingCart, Loader2 } from 'lucide-react';
+import { ArrowRight, Minus, Plus, ShoppingCart, Loader2, Play, Image as ImageIcon } from 'lucide-react';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -16,6 +18,7 @@ const ProductDetail = () => {
   const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
   const { products, loading } = useProducts();
+  const { t } = useLanguage();
   
   const product = products.find(p => p.id === id);
   
@@ -43,11 +46,11 @@ const ProductDetail = () => {
             className="mb-6"
           >
             <ArrowRight className="ml-2 h-4 w-4" />
-            العودة للرئيسية
+            {t('back.to.home')}
           </Button>
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-foreground mb-4">المنتج غير موجود</h2>
-            <p className="text-muted-foreground">هذا المنتج غير متوفر أو تم حذفه</p>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Product Not Found</h2>
+            <p className="text-muted-foreground">This product is not available or has been deleted</p>
           </div>
         </div>
       </div>
@@ -79,60 +82,128 @@ const ProductDetail = () => {
           className="mb-6"
         >
           <ArrowRight className="ml-2 h-4 w-4" />
-          العودة للرئيسية
+          {t('back.to.home')}
         </Button>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Product Images and Videos */}
           <div className="space-y-4">
-            <div className="aspect-square overflow-hidden rounded-lg bg-background">
-              <img 
-                src={product.image} 
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            
             {/* Media Gallery */}
             {product.media && product.media.length > 0 ? (
-              <div className="space-y-4">
-                <h3 className="font-semibold text-foreground">معرض الصور والفيديوهات</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {/* Main product image first */}
+                  <CarouselItem>
+                    <div className="aspect-square overflow-hidden rounded-lg bg-background">
+                      <img 
+                        src={product.image} 
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </CarouselItem>
+                  
+                  {/* Additional media */}
                   {product.media
                     .sort((a, b) => a.display_order - b.display_order)
                     .map((media, index) => (
-                      <div key={media.id || index} className="aspect-square overflow-hidden rounded-lg bg-muted">
-                        {media.media_type === 'image' ? (
+                      <CarouselItem key={media.id || index}>
+                        <div className="aspect-square overflow-hidden rounded-lg bg-muted relative">
+                          {media.media_type === 'image' ? (
+                            <img 
+                              src={media.media_url} 
+                              alt={`${product.name} - Image ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <>
+                              <video 
+                                src={media.media_url}
+                                className="w-full h-full object-cover"
+                                controls
+                                preload="metadata"
+                              />
+                              <div className="absolute top-2 left-2 bg-black bg-opacity-50 rounded p-1">
+                                <Play className="h-4 w-4 text-white" />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
+            ) : (
+              /* Fallback to main image only */
+              <div className="aspect-square overflow-hidden rounded-lg bg-background">
+                <img 
+                  src={product.image} 
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            
+            {/* Thumbnail grid for additional media */}
+            {product.media && product.media.length > 0 && (
+              <div className="grid grid-cols-3 gap-4">
+                <div className="aspect-square overflow-hidden rounded-lg bg-muted border-2 border-primary">
+                  <img 
+                    src={product.image} 
+                    alt={`${product.name} - Main`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {product.media
+                  .sort((a, b) => a.display_order - b.display_order)
+                  .slice(0, 2)
+                  .map((media, index) => (
+                    <div key={media.id || index} className="aspect-square overflow-hidden rounded-lg bg-muted relative cursor-pointer hover:opacity-80 transition-opacity">
+                      {media.media_type === 'image' ? (
+                        <>
                           <img 
                             src={media.media_url} 
-                            alt={`${product.name} - صورة ${index + 1}`}
-                            className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={() => {
-                              // Open image in a new tab or lightbox
-                              window.open(media.media_url, '_blank');
-                            }}
+                            alt={`${product.name} - Thumbnail ${index + 1}`}
+                            className="w-full h-full object-cover"
                           />
-                        ) : (
+                          <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 rounded p-1">
+                            <ImageIcon className="h-3 w-3 text-white" />
+                          </div>
+                        </>
+                      ) : (
+                        <>
                           <video 
                             src={media.media_url}
-                            className="w-full h-full object-cover cursor-pointer"
-                            controls
+                            className="w-full h-full object-cover"
+                            muted
                             preload="metadata"
-                            onClick={(e) => e.stopPropagation()}
                           />
-                        )}
-                      </div>
-                    ))}
-                </div>
+                          <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 rounded p-1">
+                            <Play className="h-3 w-3 text-white" />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                {product.media.length > 2 && (
+                  <div className="aspect-square overflow-hidden rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
+                    +{product.media.length - 2} more
+                  </div>
+                )}
               </div>
-            ) : (
+            )}
+            
+            {/* Fallback grid when no additional media */}
+            {(!product.media || product.media.length === 0) && (
               <div className="grid grid-cols-3 gap-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="aspect-square overflow-hidden rounded-lg bg-muted">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className={`aspect-square overflow-hidden rounded-lg bg-muted ${i === 0 ? 'border-2 border-primary' : ''}`}>
                     <img 
                       src={product.image} 
-                      alt={`${product.name} - صورة ${i}`}
-                      className="w-full h-full object-cover opacity-70"
+                      alt={`${product.name} - Image ${i + 1}`}
+                      className={`w-full h-full object-cover ${i === 0 ? '' : 'opacity-70'}`}
                     />
                   </div>
                 ))}
@@ -152,18 +223,18 @@ const ProductDetail = () => {
               <Badge 
                 variant={product.quantity > 10 ? "default" : product.quantity > 0 ? "secondary" : "destructive"}
               >
-                {product.quantity > 0 ? `متوفر: ${product.quantity} قطعة` : 'غير متوفر'}
+                {product.quantity > 0 ? `${t('available')}: ${product.quantity} ${t('pieces')}` : t('out.of.stock')}
               </Badge>
             </div>
             
             {/* Features */}
             <div className="card-elegant p-4">
-              <h3 className="font-semibold mb-3">مميزات المنتج:</h3>
+              <h3 className="font-semibold mb-3">Product Features:</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• جودة عالية ومواد ممتازة</li>
-                <li>• ضمان لمدة سنة كاملة</li>
-                <li>• شحن مجاني داخل المدينة</li>
-                <li>• إمكانية الإرجاع خلال 14 يوم</li>
+                <li>• High quality and excellent materials</li>
+                <li>• Full year warranty</li>
+                <li>• Free shipping within the city</li>
+                <li>• Return option within 14 days</li>
               </ul>
             </div>
             
@@ -171,7 +242,7 @@ const ProductDetail = () => {
             {product.quantity > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <label className="font-medium">الكمية:</label>
+                  <label className="font-medium">{t('quantity')}:</label>
                   <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
@@ -207,19 +278,19 @@ const ProductDetail = () => {
                     size="lg"
                   >
                     <ShoppingCart className="ml-2 h-5 w-5" />
-                    إضافة للسلة
+                    {t('add.to.cart')}
                   </Button>
                   <Button 
                     variant="outline"
                     onClick={() => navigate('/cart')}
                     size="lg"
                   >
-                    عرض السلة
+                    View Cart
                   </Button>
                 </div>
                 
                 <div className="text-center text-muted-foreground">
-                  <p>المجموع: <span className="font-bold text-primary">{(product.price * quantity).toFixed(2)} ₪</span></p>
+                  <p>{t('total')}: <span className="font-bold text-primary">{(product.price * quantity).toFixed(2)} ₪</span></p>
                 </div>
               </div>
             )}

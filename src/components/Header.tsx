@@ -1,15 +1,19 @@
 import { Store, Phone, MapPin, ShoppingCart, User, LogOut, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { LanguageToggle } from '@/components/ui/language-toggle';
 export function Header() {
   const navigate = useNavigate();
   const { totalItems } = useCart();
   const [user, setUser] = useState<any>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Get initial session
@@ -41,8 +45,8 @@ export function Header() {
               <Store className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">متجر الجيوسي</h1>
-              <p className="text-muted-foreground">منتجات متنوعة وأصيلة</p>
+              <h1 className="text-2xl font-bold text-foreground">{t('store.name')}</h1>
+              <p className="text-muted-foreground">{t('store.tagline')}</p>
             </div>
           </div>
           
@@ -54,11 +58,14 @@ export function Header() {
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                <span>فلسطين</span>
+                <span>{t('palestine')}</span>
               </div>
             </div>
             
             <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <LanguageToggle />
+              
               <Button variant="outline" size="sm" onClick={() => navigate('/cart')} className="relative">
                 <ShoppingCart className="h-4 w-4" />
                 {totalItems > 0 && <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
@@ -71,17 +78,17 @@ export function Header() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
                       <User className="h-4 w-4 ml-2" />
-                      حسابي
+                      {t('my.account')}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => navigate('/orders')}>
                       <Package className="h-4 w-4 ml-2" />
-                      طلباتي
+                      {t('my.orders')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="h-4 w-4 ml-2" />
-                      تسجيل الخروج
+                      {t('logout')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -92,7 +99,7 @@ export function Header() {
                   onClick={() => navigate('/auth')}
                 >
                   <User className="h-4 w-4 ml-2" />
-                  تسجيل الدخول
+                  {t('login')}
                 </Button>
               )}
             </div>

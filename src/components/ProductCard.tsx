@@ -2,6 +2,7 @@ import { Product } from '@/hooks/useProducts';
 import { Button } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ProductCardProps {
   product: Product;
@@ -9,6 +10,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="card-elegant p-6 group hover:scale-105 transition-bounce">
@@ -29,7 +31,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <p className="text-2xl font-bold text-primary">{product.price.toFixed(2)} ₪</p>
-            <p className="text-sm text-muted-foreground">متوفر: {product.quantity} قطعة</p>
+            <p className="text-sm text-muted-foreground">{t('available')}: {product.quantity} {t('pieces')}</p>
           </div>
         </div>
         
@@ -39,7 +41,7 @@ export function ProductCard({ product }: ProductCardProps) {
           className="w-full btn-primary group"
         >
           <Eye className="ml-2 h-4 w-4 group-hover:scale-110 transition-smooth" />
-          {product.quantity > 0 ? 'عرض المزيد' : 'غير متوفر'}
+          {product.quantity > 0 ? t('view.more') : t('out.of.stock')}
         </Button>
       </div>
     </div>
