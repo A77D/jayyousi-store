@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useProducts } from '@/hooks/useProducts';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, Loader2, Upload, X, Play, Image as ImageIcon, Link } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Upload, X, Play, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Table,
@@ -25,17 +25,6 @@ interface ProductMedia {
   display_order: number;
 }
 
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-  short_description?: string;
-  long_description?: string;
-  media?: ProductMedia[];
-}
-
 interface ProductForm {
   name: string;
   price: string;
@@ -47,14 +36,12 @@ interface ProductForm {
 }
 
 export function ProductManagement() {
-  const { products, loading, addProduct, updateProduct, deleteProduct, addProductMedia, deleteProductMedia } = useProducts();
+  const { products, loading, addProduct, updateProduct, deleteProduct, addProductMedia, deleteProductMedia, fetchProducts } = useProducts();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [mediaUrlInput, setMediaUrlInput] = useState('');
-  
   const [formData, setFormData] = useState<ProductForm>({
     name: '',
     price: '',
@@ -64,13 +51,6 @@ export function ProductManagement() {
     long_description: '',
     media: []
   });
-
-  // Update main image whenever media list changes
-  useEffect(() => {
-    const firstImage = formData.media.find(m => m.media_type === 'image');
-    setFormData(f => ({ ...f, image: firstImage?.media_url || '' }));
-  }, [formData.media]);
-
 
   const resetForm = () => {
     setFormData({
@@ -98,6 +78,7 @@ export function ProductManagement() {
         const fileName = `${Date.now()}_${i}.${fileExt}`;
         const filePath = `products/${fileName}`;
 
+        // Determine media type based on file extension
         const isVideo = ['mp4', 'webm', 'mov', 'avi'].includes(fileExt || '');
         const mediaType = isVideo ? 'video' : 'image';
 
@@ -105,9 +86,14 @@ export function ProductManagement() {
           .from('product-images')
           .upload(filePath, file);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          throw uploadError;
+        }
 
-        const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
+        const { data } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(filePath);
+
         newMedia.push({
           media_url: data.publicUrl,
           media_type: mediaType,
@@ -115,7 +101,13 @@ export function ProductManagement() {
         });
       }
 
-      setFormData({ ...formData, media: [...formData.media, ...newMedia] });
+      setFormData({ 
+        ...formData, 
+        media: [...formData.media, ...newMedia],
+        // Set the first uploaded image as main image if no image is set
+        image: formData.image || (newMedia.find(m => m.media_type === 'image')?.media_url || formData.image)
+      });
+
       toast({
         title: "تم رفع الملفات بنجاح",
         description: `تم رفع ${files.length} ملف وإضافتها للمنتج`,
@@ -131,26 +123,14 @@ export function ProductManagement() {
     }
   };
 
-  const handleAddMediaFromUrl = () => {
-    if (!mediaUrlInput.trim()) return;
-
-    const url = mediaUrlInput.trim().toLowerCase();
-    const isVideo = ['mp4', 'webm', 'mov', 'ogg'].some(ext => url.endsWith(ext));
-    const mediaType = isVideo ? 'video' : 'image';
-
-    const newMediaItem: ProductMedia = {
-      media_url: mediaUrlInput.trim(),
-      media_type: mediaType,
-      display_order: formData.media.length,
-    };
-
-    setFormData({ ...formData, media: [...formData.media, newMediaItem] });
-    setMediaUrlInput('');
-  };
-
-  const removeMedia = async (index: number) => {
-    const mediaToRemove = formData.media[index];
-    setFormData({ ...formData, media: formData.media.filter((_, i) => i !== index) });
+  const removeMedia = (index: number) => {
+    const updatedMedia = formData.media.filter((_, i) => i !== index);
+    setFormData({ 
+      ...formData, 
+      media: updatedMedia,
+      // Update main image if we removed the current main image
+      image: updatedMedia.find(m => m.media_type === 'image')?.media_url || formData.image
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -167,38 +147,31 @@ export function ProductManagement() {
 
     let result;
     if (editingProduct) {
-      result = await updateProduct(editingProduct.id, productData);
-      if (result.success) {
-        const originalMedia = editingProduct.media || [];
-        const newMedia = formData.media || [];
-
-        const mediaToAdd = newMedia.filter(nm => !originalMedia.some(om => om.media_url === nm.media_url));
-        const mediaToDelete = originalMedia.filter(om => !newMedia.some(nm => nm.media_url === om.media_url));
-        
-        for (const media of mediaToDelete) {
-          if (media.id) await deleteProductMedia(media.id);
-        }
-        for (const media of mediaToAdd) {
-          await addProductMedia(editingProduct.id, media.media_url, media.media_type, media.display_order);
-        }
-      }
+      result = await updateProduct(editingProduct, productData);
     } else {
       result = await addProduct(productData);
-      if (result.success && result.data) {
-        const newProductId = result.data[0].id;
-        for (const media of formData.media) {
-          await addProductMedia(newProductId, media.media_url, media.media_type, media.display_order);
-        }
-      }
     }
 
     if (result.success) {
+      // Add media files if this is a new product
+      if (!editingProduct && formData.media.length > 0) {
+        // Get the created product ID from the products list
+        await fetchProducts(); // Refresh to get the new product
+        const newProduct = products.find(p => p.name === formData.name && p.price === parseFloat(formData.price));
+        if (newProduct) {
+          for (const media of formData.media) {
+            await addProductMedia(newProduct.id, media.media_url, media.media_type, media.display_order);
+          }
+        }
+      }
+
       toast({
         title: editingProduct ? "تم تحديث المنتج" : "تم إضافة المنتج",
         description: "تم حفظ البيانات بنجاح"
       });
       setIsDialogOpen(false);
       resetForm();
+      fetchProducts();
     } else {
       toast({
         title: "خطأ",
@@ -208,7 +181,7 @@ export function ProductManagement() {
     }
   };
 
-  const handleEdit = (product: Product) => {
+  const handleEdit = (product: any) => {
     setFormData({
       name: product.name,
       price: product.price.toString(),
@@ -218,7 +191,7 @@ export function ProductManagement() {
       long_description: product.long_description || '',
       media: product.media || []
     });
-    setEditingProduct(product);
+    setEditingProduct(product.id);
     setIsDialogOpen(true);
   };
 
@@ -226,15 +199,26 @@ export function ProductManagement() {
     if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
       const result = await deleteProduct(id);
       if (result.success) {
-        toast({ title: "تم حذف المنتج", description: "تم حذف المنتج بنجاح" });
+        toast({
+          title: "تم حذف المنتج",
+          description: "تم حذف المنتج بنجاح"
+        });
       } else {
-        toast({ title: "خطأ", description: result.error, variant: "destructive" });
+        toast({
+          title: "خطأ",
+          description: result.error,
+          variant: "destructive"
+        });
       }
     }
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
   }
 
   return (
@@ -242,54 +226,187 @@ export function ProductManagement() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>إدارة المنتجات</CardTitle>
-          <Dialog open={isDialogOpen} onOpenChange={(isOpen) => { if (!isOpen) resetForm(); setIsDialogOpen(isOpen); }}>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => setIsDialogOpen(true)}><Plus className="ml-2 h-4 w-4" />إضافة منتج جديد</Button>
+              <Button onClick={resetForm}>
+                <Plus className="ml-2 h-4 w-4" />
+                إضافة منتج جديد
+              </Button>
             </DialogTrigger>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader><DialogTitle>{editingProduct ? 'تعديل المنتج' : 'إضافة منتج جديد'}</DialogTitle></DialogHeader>
+              <DialogHeader>
+                <DialogTitle>
+                  {editingProduct ? 'تعديل المنتج' : 'إضافة منتج جديد'}
+                </DialogTitle>
+              </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label htmlFor="name">اسم المنتج</Label><Input id="name" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} /></div>
-                  <div className="space-y-2"><Label htmlFor="price">السعر (₪)</Label><Input id="price" type="number" step="0.01" required value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} /></div>
+                  <div className="space-y-2">
+                    <Label htmlFor="name">اسم المنتج</Label>
+                    <Input
+                      id="name"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="price">السعر (₪)</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      step="0.01"
+                      required
+                      value={formData.price}
+                      onChange={(e) => setFormData({...formData, price: e.target.value})}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2"><Label htmlFor="quantity">الكمية المتوفرة</Label><Input id="quantity" type="number" required value={formData.quantity} onChange={(e) => setFormData({...formData, quantity: e.target.value})} /></div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="quantity">الكمية المتوفرة</Label>
+                  <Input
+                    id="quantity"
+                    type="number"
+                    required
+                    value={formData.quantity}
+                    onChange={(e) => setFormData({...formData, quantity: e.target.value})}
+                  />
+                </div>
                 
                 <div className="space-y-2">
-                  <Label>الصور والفيديوهات (الأولى هي الصورة الرئيسية)</Label>
-                  <div className="p-4 border rounded-lg space-y-3">
+                  <Label>الصور والفيديوهات</Label>
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="flex-1"
+                      >
+                        {uploading ? (
+                          <>
+                            <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                            جاري الرفع...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="ml-2 h-4 w-4" />
+                            رفع ملفات (صور/فيديوهات)
+                          </>
+                        )}
+                      </Button>
+                      <Input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*,video/*"
+                        multiple
+                        onChange={(e) => handleFileUpload(e.target.files)}
+                        className="hidden"
+                      />
+                    </div>
+                    
+                    {/* Display uploaded media */}
                     {formData.media.length > 0 && (
-                      <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 border rounded-lg">
                         {formData.media.map((media, index) => (
-                          <div key={index} className="relative group aspect-square">
-                            <div className="w-full h-full overflow-hidden rounded-lg bg-muted relative">
-                              {media.media_type === 'image' ? <img src={media.media_url} alt={`Media ${index + 1}`} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-black"><Play className="h-8 w-8 text-white" /></div>}
-                              <Button type="button" size="sm" variant="destructive" className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100" onClick={() => removeMedia(index)}><X className="h-3 w-3" /></Button>
-                              <div className="absolute bottom-1 left-1">{media.media_type === 'image' ? <ImageIcon className="h-4 w-4 text-white bg-black/50 rounded p-1" /> : <Play className="h-4 w-4 text-white bg-black/50 rounded p-1" />}</div>
+                          <div key={index} className="relative group">
+                            <div className="w-full h-32 overflow-hidden rounded-lg bg-muted relative">
+                              {media.media_type === 'image' ? (
+                                <img 
+                                  src={media.media_url} 
+                                  alt={`Media ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-black">
+                                  <Play className="h-8 w-8 text-white" />
+                                  <video 
+                                    src={media.media_url}
+                                    className="w-full h-full object-cover absolute inset-0"
+                                    muted
+                                  />
+                                </div>
+                              )}
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="destructive"
+                                className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => removeMedia(index)}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                              <div className="absolute bottom-1 left-1">
+                                {media.media_type === 'image' ? (
+                                  <ImageIcon className="h-4 w-4 text-white bg-black bg-opacity-50 rounded p-1" />
+                                ) : (
+                                  <Play className="h-4 w-4 text-white bg-black bg-opacity-50 rounded p-1" />
+                                )}
+                              </div>
                             </div>
                           </div>
                         ))}
                       </div>
                     )}
-                    <div className="flex gap-2">
-                      <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploading} className="flex-1">
-                        {uploading ? <><Loader2 className="ml-2 h-4 w-4 animate-spin" /> جاري الرفع...</> : <><Upload className="ml-2 h-4 w-4" /> رفع ملفات</>}
-                      </Button>
-                      <Input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={(e) => handleFileUpload(e.target.files)} className="hidden" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Input placeholder="أو أضف رابط صورة/فيديو" value={mediaUrlInput} onChange={(e) => setMediaUrlInput(e.target.value)} />
-                      <Button type="button" variant="outline" onClick={handleAddMediaFromUrl}><Link className="ml-2 h-4 w-4" />إضافة رابط</Button>
-                    </div>
+
+                    <div className="text-center text-sm text-muted-foreground">أو</div>
+                    <Input
+                      placeholder="رابط الصورة الرئيسية"
+                      value={formData.image}
+                      onChange={(e) => setFormData({...formData, image: e.target.value})}
+                    />
+                    {formData.image && (
+                      <div className="w-full h-32 overflow-hidden rounded-lg bg-muted">
+                        <img 
+                          src={formData.image} 
+                          alt="معاينة المنتج"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
                 
-                <div className="space-y-2"><Label htmlFor="short_description">الوصف المختصر</Label><Textarea id="short_description" value={formData.short_description} onChange={(e) => setFormData({...formData, short_description: e.target.value})} rows={2} /></div>
-                <div className="space-y-2"><Label htmlFor="long_description">الوصف التفصيلي</Label><Textarea id="long_description" value={formData.long_description} onChange={(e) => setFormData({...formData, long_description: e.target.value})} rows={4} /></div>
+                <div className="space-y-2">
+                  <Label htmlFor="short_description">الوصف المختصر (يظهر في الصفحة الرئيسية)</Label>
+                  <Textarea
+                    id="short_description"
+                    placeholder="وصف قصير يلخص المنتج في سطر أو سطرين"
+                    value={formData.short_description}
+                    onChange={(e) => setFormData({...formData, short_description: e.target.value})}
+                    rows={2}
+                  />
+                </div>
                 
-                <div className="flex gap-2 pt-4">
-                  <Button type="submit" className="flex-1" disabled={loading}>{editingProduct ? 'تحديث المنتج' : 'إضافة المنتج'}</Button>
-                  <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="flex-1">إلغاء</Button>
+                <div className="space-y-2">
+                  <Label htmlFor="long_description">الوصف التفصيلي (يظهر في صفحة المنتج)</Label>
+                  <Textarea
+                    id="long_description"
+                    placeholder="وصف مفصل عن المنتج، مميزاته، واستخداماته"
+                    value={formData.long_description}
+                    onChange={(e) => setFormData({...formData, long_description: e.target.value})}
+                    rows={4}
+                  />
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button type="submit" className="flex-1">
+                    {editingProduct ? 'تحديث' : 'إضافة'}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setIsDialogOpen(false)}
+                    className="flex-1"
+                  >
+                    إلغاء
+                  </Button>
                 </div>
               </form>
             </DialogContent>
@@ -311,15 +428,37 @@ export function ProductManagement() {
           <TableBody>
             {products.map((product) => (
               <TableRow key={product.id}>
-                <TableCell><img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded-lg bg-muted" onError={(e) => e.currentTarget.src = '/placeholder.svg'} /></TableCell>
+                <TableCell>
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-12 h-12 object-cover rounded-lg"
+                  />
+                </TableCell>
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>{product.price.toFixed(2)} ₪</TableCell>
                 <TableCell>{product.quantity}</TableCell>
-                <TableCell>{product.media?.length || 0} ملف</TableCell>
+                <TableCell>
+                  <div className="text-sm text-muted-foreground">
+                    {product.media?.length || 0} ملف
+                  </div>
+                </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => handleEdit(product)}><Edit className="h-3 w-3" /></Button>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(product.id)}><Trash2 className="h-3 w-3" /></Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEdit(product)}
+                    >
+                      <Edit className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleDelete(product.id)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
