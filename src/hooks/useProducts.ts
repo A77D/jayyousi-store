@@ -38,7 +38,6 @@ export function useProducts() {
 
       if (error) throw error;
       
-      // Transform the data to ensure proper typing
       const transformedData = (data || []).map(product => ({
         ...product,
         media: (product.media || []).map(m => ({
@@ -59,7 +58,7 @@ export function useProducts() {
     fetchProducts();
   }, []);
 
-  const addProduct = async (product: Omit<Product, 'id'>) => {
+  const addProduct = async (product: Omit<Product, 'id' | 'media'>) => {
     try {
       const { data, error } = await supabase
         .from('products')
@@ -68,8 +67,7 @@ export function useProducts() {
         .single();
 
       if (error) throw error;
-      setProducts(prev => [data, ...prev]);
-      return { success: true };
+      return { success: true, data };
     } catch (err) {
       return { 
         success: false, 
@@ -88,8 +86,7 @@ export function useProducts() {
         .single();
 
       if (error) throw error;
-      setProducts(prev => prev.map(p => p.id === id ? data : p));
-      return { success: true };
+      return { success: true, data };
     } catch (err) {
       return { 
         success: false, 
@@ -100,13 +97,28 @@ export function useProducts() {
 
   const deleteProduct = async (id: string) => {
     try {
+      // First, delete associated media from storage
+      const { data: media, error: mediaError } = await supabase
+        .from('product_media')
+        .select('media_url')
+        .eq('product_id', id);
+
+      if (mediaError) throw mediaError;
+
+      if (media && media.length > 0) {
+        const filesToRemove = media.map(m => m.media_url.substring(m.media_url.lastIndexOf('/') + 1));
+        await supabase.storage.from('product-images').remove(filesToRemove);
+      }
+
+      // Then, delete the product record, which will cascade delete media records
       const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
-      setProducts(prev => prev.filter(p => p.id !== id));
+      
+      fetchProducts(); // Refresh the product list
       return { success: true };
     } catch (err) {
       return { 
@@ -141,6 +153,20 @@ export function useProducts() {
 
   const deleteProductMedia = async (mediaId: string) => {
     try {
+      // First, get the media URL to delete from storage
+      const { data: media, error: mediaError } = await supabase
+        .from('product_media')
+        .select('media_url')
+        .eq('id', mediaId)
+        .single();
+      
+      if (mediaError) throw mediaError;
+
+      if (media) {
+        const fileToRemove = media.media_url.substring(media.media_url.lastIndexOf('/') + 1);
+        await supabase.storage.from('product-images').remove([fileToRemove]);
+      }
+
       const { error } = await supabase
         .from('product_media')
         .delete()
