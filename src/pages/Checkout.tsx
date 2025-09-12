@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowRight, MapPin, Phone, User, MessageCircle, Truck } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CheckoutForm {
   fullName: string;
@@ -18,17 +19,18 @@ interface CheckoutForm {
   deliveryZone: string;
 }
 
-const deliveryZones = [
-  { id: 'west-bank', name: 'الضفة الغربية', price: 20 },
-  { id: 'jerusalem', name: 'القدس', price: 50 },
-  { id: 'interior', name: 'الداخل المحتل', price: 70 }
-];
-
 const Checkout = () => {
   const navigate = useNavigate();
   const { items, totalPrice, clearCart, submitOrder } = useCart();
   const { toast } = useToast();
+  const { t } = useLanguage();
   
+  const deliveryZones = [
+    { id: 'west-bank', name: t('west.bank'), price: 20 },
+    { id: 'jerusalem', name: t('jerusalem'), price: 50 },
+    { id: 'interior', name: t('occupied.interior'), price: 70 }
+  ];
+
   const [formData, setFormData] = useState<CheckoutForm>({
     fullName: '',
     phoneNumber: '',
@@ -53,15 +55,15 @@ const Checkout = () => {
     
     if (result.success) {
       toast({
-        title: "تم إرسال الطلب بنجاح",
-        description: "سيتم التواصل معك قريباً لتأكيد الطلب",
+        title: t('order.success.title'),
+        description: t('order.success.description'),
       });
       clearCart();
       navigate(`/thank-you?order=${result.orderId || Math.random().toString(36).substr(2, 9)}`);
     } else {
       toast({
-        title: "خطأ في إرسال الطلب",
-        description: result.error || "حدث خطأ غير متوقع",
+        title: t('order.error.title'),
+        description: result.error || t('order.error.description'),
         variant: "destructive"
       });
     }
@@ -78,24 +80,24 @@ const Checkout = () => {
           className="mb-6"
         >
           <ArrowRight className="ml-2 h-4 w-4" />
-          العودة للسلة
+          {t('back.to.cart')}
         </Button>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Checkout Form */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-foreground">معلومات التوصيل</h2>
+            <h2 className="text-2xl font-bold text-foreground">{t('delivery.information')}</h2>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="fullName" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  الاسم الكامل
+                  {t('full.name')}
                 </Label>
                 <Input
                   id="fullName"
                   required
-                  placeholder="أدخل اسمك الكامل"
+                  placeholder={t('enter.full.name')}
                   value={formData.fullName}
                   onChange={(e) => setFormData({...formData, fullName: e.target.value})}
                   className="input-elegant"
@@ -105,13 +107,13 @@ const Checkout = () => {
               <div className="space-y-2">
                 <Label htmlFor="phoneNumber" className="flex items-center gap-2">
                   <Phone className="h-4 w-4" />
-                  رقم الهاتف
+                  {t('phone.number')}
                 </Label>
                 <Input
                   id="phoneNumber"
                   required
                   type="tel"
-                  placeholder="+970-xxx-xxx-xxx"
+                  placeholder={t('phone.number.placeholder')}
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
                   className="input-elegant"
@@ -121,7 +123,7 @@ const Checkout = () => {
               <div className="space-y-2">
                 <Label htmlFor="deliveryZone" className="flex items-center gap-2">
                   <Truck className="h-4 w-4" />
-                  منطقة التوصيل
+                  {t('delivery.zone')}
                 </Label>
                 <Select 
                   value={formData.deliveryZone}
@@ -129,7 +131,7 @@ const Checkout = () => {
                   required
                 >
                   <SelectTrigger className="input-elegant">
-                    <SelectValue placeholder="اختر منطقة التوصيل" />
+                    <SelectValue placeholder={t('choose.delivery.zone')} />
                   </SelectTrigger>
                   <SelectContent>
                     {deliveryZones.map((zone) => (
@@ -144,12 +146,12 @@ const Checkout = () => {
               <div className="space-y-2">
                 <Label htmlFor="address" className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  عنوان التوصيل التفصيلي
+                  {t('detailed.delivery.address')}
                 </Label>
                 <Textarea
                   id="address"
                   required
-                  placeholder="أدخل العنوان الكامل مع تفاصيل الموقع"
+                  placeholder={t('enter.detailed.address')}
                   value={formData.address}
                   onChange={(e) => setFormData({...formData, address: e.target.value})}
                   className="input-elegant min-h-[100px]"
@@ -159,11 +161,11 @@ const Checkout = () => {
               <div className="space-y-2">
                 <Label htmlFor="notes" className="flex items-center gap-2">
                   <MessageCircle className="h-4 w-4" />
-                  ملاحظات إضافية (اختياري)
+                  {t('additional.notes.optional')}
                 </Label>
                 <Textarea
                   id="notes"
-                  placeholder="أي ملاحظات أو طلبات خاصة"
+                  placeholder={t('any.special.notes')}
                   value={formData.notes}
                   onChange={(e) => setFormData({...formData, notes: e.target.value})}
                   className="input-elegant"
@@ -175,7 +177,7 @@ const Checkout = () => {
                 className="w-full btn-primary" 
                 size="lg"
               >
-                تأكيد الطلب
+                {t('confirm.order')}
               </Button>
             </form>
           </div>
@@ -183,7 +185,7 @@ const Checkout = () => {
           {/* Order Summary */}
           <div className="space-y-4">
             <div className="card-elegant p-6 sticky top-4">
-              <h3 className="text-xl font-bold text-foreground mb-4">ملخص الطلب</h3>
+              <h3 className="text-xl font-bold text-foreground mb-4">{t('order.summary')}</h3>
               
               <div className="space-y-4 mb-6">
                 {items.map((item) => (
@@ -210,18 +212,18 @@ const Checkout = () => {
               
               <div className="border-t border-border pt-4">
                 <div className="flex justify-between items-center mb-2">
-                  <span>المجموع الفرعي:</span>
+                  <span>{t('subtotal')}:</span>
                   <span>{totalPrice.toFixed(2)} ₪</span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <span>رسوم التوصيل:</span>
+                  <span>{t('delivery.fee')}:</span>
                   <span className={deliveryPrice > 0 ? "text-primary font-medium" : "text-green-600"}>
-                    {deliveryPrice > 0 ? `${deliveryPrice.toFixed(2)} ₪` : 'اختر المنطقة'}
+                    {deliveryPrice > 0 ? `${deliveryPrice.toFixed(2)} ₪` : t('select.zone')}
                   </span>
                 </div>
                 <div className="border-t border-border pt-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold">المجموع الكلي:</span>
+                    <span className="text-lg font-bold">{t('grand.total')}:</span>
                     <span className="text-2xl font-bold text-primary">
                       {finalTotal.toFixed(2)} ₪
                     </span>
