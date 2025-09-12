@@ -50,6 +50,21 @@ const translations = {
     'phone': 'الهاتف',
     'address': 'العنوان',
     'palestine': 'فلسطين',
+
+    // Footer from image
+    'diverse.and.many.products': 'منتجات متنوعة و كثيرة',
+    'all.our.products.are.carefully.selected': 'جميع منتجاتنا مختارة بعناية من أجود المصادر',
+    'excellent.customer.service': 'خدمة عملاء ممتازة',
+    'support.team.available.to.answer.inquiries': 'فريق دعم متاح للرد على استفساراتكم',
+    'fast.delivery': 'توصيل سريع',
+    'your.order.will.be.delivered.asap': 'توصل طلبكم في أسرع وقت ممكن',
+    'store.specializing.in.selling.diverse.and.modern.products': 'متجر متخصص في بيع المنتجات المتنوعة والعصرية',
+    'contact.us': 'تواصل معنا',
+    'working.hours': 'ساعات العمل',
+    'saturday.thursday': 'السبت - الخميس : 9:00 ص - 10:00 م',
+    'friday': 'الجمعة: 2:00 م - 10:00 م',
+    'copyright': '© 2024 متجر الجيوسي. جميع الحقوق محفوظة',
+    'administration': 'إدارة',
   },
   en: {
     // Header
@@ -92,6 +107,21 @@ const translations = {
     'phone': 'Phone',
     'address': 'Address',
     'palestine': 'Palestine',
+
+    // Footer from image
+    'diverse.and.many.products': 'Diverse and many products',
+    'all.our.products.are.carefully.selected': 'All our products are carefully selected from the best sources',
+    'excellent.customer.service': 'Excellent customer service',
+    'support.team.available.to.answer.inquiries': 'A support team is available to answer your inquiries',
+    'fast.delivery': 'Fast delivery',
+    'your.order.will.be.delivered.asap': 'Your order will be delivered as soon as possible',
+    'store.specializing.in.selling.diverse.and.modern.products': 'A store specializing in selling diverse and modern products',
+    'contact.us': 'Contact us',
+    'working.hours': 'Working hours',
+    'saturday.thursday': 'Saturday - Thursday: 9:00 AM - 10:00 PM',
+    'friday': 'Friday: 2:00 PM - 10:00 PM',
+    'copyright': '© 2024 Jayyousi Store. All rights reserved',
+    'administration': 'Administration',
   },
   he: {
     // Header
@@ -134,6 +164,21 @@ const translations = {
     'phone': 'טלפון',
     'address': 'כתובת',
     'palestine': 'פלסטין',
+
+    // Footer from image
+    'diverse.and.many.products': 'מוצרים מגוונים ורבים',
+    'all.our.products.are.carefully.selected': 'כל המוצרים שלנו נבחרים בקפידה מהמקורות הטובים ביותר',
+    'excellent.customer.service': 'שירות לקוחות מעולה',
+    'support.team.available.to.answer.inquiries': 'צוות תמיכה זמין לענות לפניותיכם',
+    'fast.delivery': 'משלוח מהיר',
+    'your.order.will.be.delivered.asap': 'ההזמנה שלך תסופק בהקדם האפשרי',
+    'store.specializing.in.selling.diverse.and.modern.products': 'חנות המתמחה במכירת מוצרים מגוונים ומודרניים',
+    'contact.us': 'צור קשר',
+    'working.hours': 'שעות עבודה',
+    'saturday.thursday': 'שבת - חמישי: 9:00 - 22:00',
+    'friday': 'שישי: 14:00 - 22:00',
+    'copyright': '© 2024 חנות ג\'יוסי. כל הזכויות שמורות',
+    'administration': 'הנהלה',
   }
 };
 
