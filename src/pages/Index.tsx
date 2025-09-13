@@ -19,7 +19,7 @@ const Index = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Get initial session
@@ -38,8 +38,8 @@ const Index = () => {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     toast({
-      title: t('logout.success.title'),
-      description: t('logout.success.description'),
+      title: "تم تسجيل الخروج بنجاح",
+      description: "نراك قريباً!",
     });
   };
   return <div className="min-h-screen bg-gradient-warm">
@@ -99,24 +99,24 @@ const Index = () => {
               <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto shadow-soft">
                 <Store className="h-8 w-8 text-primary-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">{t('diverse.and.many.products')}</h4>
-              <p className="text-muted-foreground">{t('all.our.products.are.carefully.selected')}</p>
+              <h4 className="text-xl font-semibold text-foreground">Diverse Products</h4>
+              <p className="text-muted-foreground">All our products are carefully selected from the finest sources</p>
             </div>
             
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto shadow-soft">
                 <Phone className="h-8 w-8 text-primary-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">{t('excellent.customer.service')}</h4>
-              <p className="text-muted-foreground">{t('support.team.available.to.answer.inquiries')}</p>
+              <h4 className="text-xl font-semibold text-foreground">Excellent Customer Service</h4>
+              <p className="text-muted-foreground">Support team available to answer your inquiries</p>
             </div>
             
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto shadow-soft">
                 <MapPin className="h-8 w-8 text-primary-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">{t('fast.delivery')}</h4>
-              <p className="text-muted-foreground">{t('your.order.will.be.delivered.asap')}</p>
+              <h4 className="text-xl font-semibold text-foreground">Fast Delivery</h4>
+              <p className="text-muted-foreground">We deliver your order as quickly as possible</p>
             </div>
           </div>
         </div>
@@ -134,12 +134,12 @@ const Index = () => {
                 <h5 className="text-xl font-bold">{t('store.name')}</h5>
               </div>
               <p className="text-background/80">
-                {t('store.specializing.in.selling.diverse.and.modern.products')}
+                متجر متخصص في بيع المنتجات المتنوعة والعصرية
               </p>
             </div>
             
             <div>
-              <h6 className="font-semibold mb-4">{t('contact.us')}</h6>
+              <h6 className="font-semibold mb-4">Contact Us</h6>
               <div className="space-y-2 text-background/80">
                 <p className="flex items-center gap-2">
                   <Phone className="h-4 w-4" />
@@ -153,20 +153,20 @@ const Index = () => {
             </div>
             
             <div>
-              <h6 className="font-semibold mb-4">{t('working.hours')}</h6>
+              <h6 className="font-semibold mb-4">Working Hours</h6>
               <div className="space-y-1 text-background/80">
-                <p>{t('saturday.thursday')}</p>
-                <p>{t('friday')}</p>
+                <p>Saturday - Thursday: 9:00 AM - 10:00 PM</p>
+                <p>Friday: 2:00 PM - 10:00 PM</p>
               </div>
             </div>
           </div>
           
           <div className="border-t border-background/20 mt-8 pt-8 text-center text-background/60">
             <div className="flex items-center justify-center gap-4 mb-2">
-              <p>{t('copyright')}</p>
+              <p>&copy; 2024 {t('store.name')}. All rights reserved.</p>
               <Link to="/admin/login" className="flex items-center gap-1 text-xs opacity-50 hover:opacity-80 transition-opacity">
                 <Shield className="h-3 w-3" />
-                {t('administration')}
+                Admin
               </Link>
             </div>
           </div>

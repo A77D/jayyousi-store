@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowRight, MapPin, Phone, User, MessageCircle, Truck } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CheckoutForm {
   fullName: string;
@@ -19,18 +18,17 @@ interface CheckoutForm {
   deliveryZone: string;
 }
 
+const deliveryZones = [
+  { id: 'west-bank', name: 'الضفة الغربية', price: 20 },
+  { id: 'jerusalem', name: 'القدس', price: 50 },
+  { id: 'interior', name: 'الداخل المحتل', price: 70 }
+];
+
 const Checkout = () => {
   const navigate = useNavigate();
   const { items, totalPrice, clearCart, submitOrder } = useCart();
   const { toast } = useToast();
-  const { t } = useLanguage();
   
-  const deliveryZones = [
-    { id: 'west-bank', name: t('west.bank'), price: 20 },
-    { id: 'jerusalem', name: t('jerusalem'), price: 50 },
-    { id: 'interior', name: t('occupied.interior'), price: 70 }
-  ];
-
   const [formData, setFormData] = useState<CheckoutForm>({
     fullName: '',
     phoneNumber: '',
@@ -55,15 +53,15 @@ const Checkout = () => {
     
     if (result.success) {
       toast({
-        title: t('order.success.title'),
-        description: t('order.success.description'),
+        title: "تم إرسال الطلب بنجاح",
+        description: "سيتم التواصل معك قريباً لتأكيد الطلب",
       });
       clearCart();
       navigate(`/thank-you?order=${result.orderId || Math.random().toString(36).substr(2, 9)}`);
     } else {
       toast({
-        title: t('order.error.title'),
-        description: result.error || t('order.error.description'),
+        title: "خطأ في إرسال الطلب",
+        description: result.error || "حدث خطأ غير متوقع",
         variant: "destructive"
       });
     }
@@ -80,13 +78,13 @@ const Checkout = () => {
           className="mb-6"
         >
           <ArrowRight className="ml-2 h-4 w-4" />
-          {t('back.to.cart')}
+          العودة للسلة
         </Button>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Checkout Form */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-foreground">{t('delivery.information')}</h2>
+            <h2 className="text-2xl font-bold text-foreground">{t('delivery.info')}</h2>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -113,7 +111,7 @@ const Checkout = () => {
                   id="phoneNumber"
                   required
                   type="tel"
-                  placeholder={t('phone.number.placeholder')}
+                  placeholder="+970-xxx-xxx-xxx"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
                   className="input-elegant"
@@ -146,12 +144,12 @@ const Checkout = () => {
               <div className="space-y-2">
                 <Label htmlFor="address" className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  {t('detailed.delivery.address')}
+                  {t('detailed.address')}
                 </Label>
                 <Textarea
                   id="address"
                   required
-                  placeholder={t('enter.detailed.address')}
+                  placeholder={t('enter.full.address')}
                   value={formData.address}
                   onChange={(e) => setFormData({...formData, address: e.target.value})}
                   className="input-elegant min-h-[100px]"
@@ -161,11 +159,11 @@ const Checkout = () => {
               <div className="space-y-2">
                 <Label htmlFor="notes" className="flex items-center gap-2">
                   <MessageCircle className="h-4 w-4" />
-                  {t('additional.notes.optional')}
+                  {t('additional.notes')}
                 </Label>
                 <Textarea
                   id="notes"
-                  placeholder={t('any.special.notes')}
+                  placeholder={t('special.requests')}
                   value={formData.notes}
                   onChange={(e) => setFormData({...formData, notes: e.target.value})}
                   className="input-elegant"
@@ -216,9 +214,9 @@ const Checkout = () => {
                   <span>{totalPrice.toFixed(2)} ₪</span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <span>{t('delivery.fee')}:</span>
+                  <span>{t('delivery.fees')}:</span>
                   <span className={deliveryPrice > 0 ? "text-primary font-medium" : "text-green-600"}>
-                    {deliveryPrice > 0 ? `${deliveryPrice.toFixed(2)} ₪` : t('select.zone')}
+                    {deliveryPrice > 0 ? `${deliveryPrice.toFixed(2)} ₪` : t('choose.area')}
                   </span>
                 </div>
                 <div className="border-t border-border pt-2">

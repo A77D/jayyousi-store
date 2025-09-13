@@ -146,21 +146,31 @@ export function ProductManagement() {
     };
 
     let result;
+    let productId = editingProduct;
+    
     if (editingProduct) {
       result = await updateProduct(editingProduct, productData);
     } else {
       result = await addProduct(productData);
+      // Get the newly created product ID
+      if (result.success) {
+        await fetchProducts();
+        const newProduct = products.find(p => 
+          p.name === formData.name && 
+          p.price === parseFloat(formData.price) &&
+          p.quantity === parseInt(formData.quantity)
+        );
+        productId = newProduct?.id;
+      }
     }
 
     if (result.success) {
-      // Add media files if this is a new product
-      if (!editingProduct && formData.media.length > 0) {
-        // Get the created product ID from the products list
-        await fetchProducts(); // Refresh to get the new product
-        const newProduct = products.find(p => p.name === formData.name && p.price === parseFloat(formData.price));
-        if (newProduct) {
-          for (const media of formData.media) {
-            await addProductMedia(newProduct.id, media.media_url, media.media_type, media.display_order);
+      // Add media files for both new and existing products
+      if (formData.media.length > 0 && productId) {
+        for (const media of formData.media) {
+          // Only add media that doesn't have an ID (new media)
+          if (!media.id) {
+            await addProductMedia(productId, media.media_url, media.media_type, media.display_order);
           }
         }
       }
