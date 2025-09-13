@@ -92,16 +92,6 @@ const translations = {
     'friday': 'الجمعة: 2:00 م - 10:00 م',
     'copyright': '© 2024 متجر الجيوسي. جميع الحقوق محفوظة',
     'administration': 'إدارة',
-    
-    // Admin panel
-    'add.another.link': 'إضافة رابط آخر',
-    'image.video.links': 'روابط الصور والفيديوهات',
-    'image.video.link': 'رابط الصورة أو الفيديو',
-    'link.preview': 'معاينة الروابط',
-    'main.image': 'الصورة الرئيسية',
-    'main.image.link': 'رابط الصورة الرئيسية',
-    'or': 'أو',
-    'product.preview': 'معاينة المنتج',
   },
   en: {
     // Header
@@ -186,16 +176,6 @@ const translations = {
     'friday': 'Friday: 2:00 PM - 10:00 PM',
     'copyright': '© 2024 Jayyousi Store. All rights reserved',
     'administration': 'Administration',
-    
-    // Admin panel
-    'add.another.link': 'Add Another Link',
-    'image.video.links': 'Image & Video Links',
-    'image.video.link': 'Image or Video Link',
-    'link.preview': 'Link Preview',
-    'main.image': 'Main Image',
-    'main.image.link': 'Main Image Link',
-    'or': 'or',
-    'product.preview': 'Product Preview',
   },
   he: {
     // Header
@@ -280,16 +260,6 @@ const translations = {
     'friday': 'שישי: 14:00 - 22:00',
     'copyright': '© 2024 חנות ג\'יוסי. כל הזכויות שמורות',
     'administration': 'הנהלה',
-    
-    // Admin panel
-    'add.another.link': 'הוסף קישור נוסף',
-    'image.video.links': 'קישורי תמונות וסרטונים',
-    'image.video.link': 'קישור תמונה או סרטון',
-    'link.preview': 'תצוגה מקדימה של קישורים',
-    'main.image': 'תמונה ראשית',
-    'main.image.link': 'קישור תמונה ראשית',
-    'or': 'או',
-    'product.preview': 'תצוגה מקדימה של המוצר',
   }
 };
 

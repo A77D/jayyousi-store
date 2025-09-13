@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit, Trash2, Loader2, Upload, X, Play, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Table,
   TableBody,
@@ -34,13 +33,11 @@ interface ProductForm {
   short_description: string;
   long_description: string;
   media: ProductMedia[];
-  mediaUrls: string[];
 }
 
 export function ProductManagement() {
   const { products, loading, addProduct, updateProduct, deleteProduct, addProductMedia, deleteProductMedia, fetchProducts } = useProducts();
   const { toast } = useToast();
-  const { t } = useLanguage();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -52,8 +49,7 @@ export function ProductManagement() {
     quantity: '',
     short_description: '',
     long_description: '',
-    media: [],
-    mediaUrls: ['']
+    media: []
   });
 
   const resetForm = () => {
@@ -64,43 +60,11 @@ export function ProductManagement() {
       quantity: '',
       short_description: '',
       long_description: '',
-      media: [],
-      mediaUrls: ['']
+      media: []
     });
     setEditingProduct(null);
   };
 
-  const addMediaUrl = () => {
-    setFormData({
-      ...formData,
-      mediaUrls: [...formData.mediaUrls, '']
-    });
-  };
-
-  const removeMediaUrl = (index: number) => {
-    if (formData.mediaUrls.length > 1) {
-      const updatedUrls = formData.mediaUrls.filter((_, i) => i !== index);
-      setFormData({
-        ...formData,
-        mediaUrls: updatedUrls
-      });
-    }
-  };
-
-  const updateMediaUrl = (index: number, value: string) => {
-    const updatedUrls = [...formData.mediaUrls];
-    updatedUrls[index] = value;
-    setFormData({
-      ...formData,
-      mediaUrls: updatedUrls
-    });
-  };
-
-  const detectMediaType = (url: string): 'image' | 'video' => {
-    const videoExtensions = ['mp4', 'webm', 'mov', 'avi', 'mkv', 'flv', 'wmv'];
-    const extension = url.split('.').pop()?.toLowerCase();
-    return videoExtensions.includes(extension || '') ? 'video' : 'image';
-  };
   const handleFileUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
@@ -189,53 +153,14 @@ export function ProductManagement() {
     }
 
     if (result.success) {
-      let productId = editingProduct;
-      
-      // If this is a new product, get the product ID
-      if (!editingProduct) {
-        await fetchProducts();
-        const newProduct = products.find(p => 
-          p.name === formData.name && 
-          p.price === parseFloat(formData.price) &&
-          p.quantity === parseInt(formData.quantity)
-        );
-        productId = newProduct?.id;
-      }
-
       // Add media files if this is a new product
-      if (productId) {
-        // Add uploaded files
-        if (formData.media.length > 0) {
+      if (!editingProduct && formData.media.length > 0) {
+        // Get the created product ID from the products list
+        await fetchProducts(); // Refresh to get the new product
+        const newProduct = products.find(p => p.name === formData.name && p.price === parseFloat(formData.price));
+        if (newProduct) {
           for (const media of formData.media) {
-            await addProductMedia(productId, media.media_url, media.media_type, media.display_order);
-          }
-        }
-        
-        // Add URL-based media
-        const validUrls = formData.mediaUrls.filter(url => url.trim() !== '');
-        for (let i = 0; i < validUrls.length; i++) {
-          const url = validUrls[i].trim();
-          const mediaType = detectMediaType(url);
-          const displayOrder = formData.media.length + i;
-          await addProductMedia(productId, url, mediaType, displayOrder);
-        }
-      }
-
-      // If editing, handle media updates
-      if (editingProduct) {
-        // Add new URL-based media
-        const validUrls = formData.mediaUrls.filter(url => url.trim() !== '');
-        for (let i = 0; i < validUrls.length; i++) {
-          const url = validUrls[i].trim();
-          const mediaType = detectMediaType(url);
-          const displayOrder = (formData.media?.length || 0) + i;
-          await addProductMedia(editingProduct, url, mediaType, displayOrder);
-        }
-        
-        // Add uploaded files
-        if (formData.media.length > 0) {
-          for (const media of formData.media) {
-            await addProductMedia(editingProduct, media.media_url, media.media_type, media.display_order);
+            await addProductMedia(newProduct.id, media.media_url, media.media_type, media.display_order);
           }
         }
       }
@@ -264,8 +189,7 @@ export function ProductManagement() {
       quantity: product.quantity.toString(),
       short_description: product.short_description || '',
       long_description: product.long_description || '',
-      media: product.media || [],
-      mediaUrls: ['']
+      media: product.media || []
     });
     setEditingProduct(product.id);
     setIsDialogOpen(true);
@@ -354,43 +278,6 @@ export function ProductManagement() {
                 <div className="space-y-2">
                   <Label>الصور والفيديوهات</Label>
                   <div className="space-y-3">
-                    {/* URL-based media inputs */}
-                    <div className="space-y-3">
-                      <Label className="text-sm font-medium">{t('image.video.links')}</Label>
-                      {formData.mediaUrls.map((url, index) => (
-                        <div key={index} className="flex gap-2">
-                          <Input
-                            placeholder={`${t('image.video.link')} ${index + 1}`}
-                            value={url}
-                            onChange={(e) => updateMediaUrl(index, e.target.value)}
-                            className="flex-1"
-                          />
-                          {formData.mediaUrls.length > 1 && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => removeMediaUrl(index)}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={addMediaUrl}
-                        className="w-full"
-                      >
-                        <Plus className="ml-2 h-4 w-4" />
-                        {t('add.another.link')}
-                      </Button>
-                    </div>
-
-                    <div className="text-center text-sm text-muted-foreground">{t('or')}</div>
-
-                    {/* File upload section */}
                     <div className="flex gap-2">
                       <Button
                         type="button"
@@ -465,56 +352,9 @@ export function ProductManagement() {
                       </div>
                     )}
 
-                    {/* Preview URL-based media */}
-                    {formData.mediaUrls.some(url => url.trim() !== '') && (
-                      <div className="space-y-3">
-                        <Label className="text-sm font-medium">{t('link.preview')}</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 border rounded-lg">
-                          {formData.mediaUrls
-                            .filter(url => url.trim() !== '')
-                            .map((url, index) => {
-                              const mediaType = detectMediaType(url);
-                              return (
-                                <div key={index} className="relative group">
-                                  <div className="w-full h-32 overflow-hidden rounded-lg bg-muted relative">
-                                    {mediaType === 'image' ? (
-                                      <img 
-                                        src={url} 
-                                        alt={`URL Media ${index + 1}`}
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                          e.currentTarget.src = '/placeholder.svg';
-                                        }}
-                                      />
-                                    ) : (
-                                      <div className="w-full h-full flex items-center justify-center bg-black">
-                                        <Play className="h-8 w-8 text-white" />
-                                        <video 
-                                          src={url}
-                                          className="w-full h-full object-cover absolute inset-0"
-                                          muted
-                                          onError={(e) => {
-                                            e.currentTarget.style.display = 'none';
-                                          }}
-                                        />
-                                      </div>
-                                    )}
-                                    <div className="absolute bottom-1 left-1">
-                                      {mediaType === 'image' ? (
-                                        <ImageIcon className="h-4 w-4 text-white bg-black bg-opacity-50 rounded p-1" />
-                                      ) : (
-                                        <Play className="h-4 w-4 text-white bg-black bg-opacity-50 rounded p-1" />
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                        </div>
-                      </div>
-                    )}
+                    <div className="text-center text-sm text-muted-foreground">أو</div>
                     <Input
-                      placeholder={t('main.image.link')}
+                      placeholder="رابط الصورة الرئيسية"
                       value={formData.image}
                       onChange={(e) => setFormData({...formData, image: e.target.value})}
                     />
@@ -522,7 +362,7 @@ export function ProductManagement() {
                       <div className="w-full h-32 overflow-hidden rounded-lg bg-muted">
                         <img 
                           src={formData.image} 
-                          alt={t('product.preview')}
+                          alt="معاينة المنتج"
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             e.currentTarget.src = '/placeholder.svg';
@@ -629,5 +469,3 @@ export function ProductManagement() {
     </Card>
   );
 }
-
-                    <div className="text-center text-sm text-muted-foreground">{t('main.image')}</div>
