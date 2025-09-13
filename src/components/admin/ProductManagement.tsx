@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface ProductMedia {
   id?: string;
@@ -51,6 +52,9 @@ export function ProductManagement() {
     long_description: '',
     media: []
   });
+  const [newMediaUrl, setNewMediaUrl] = useState('');
+  const [newMediaType, setNewMediaType] = useState<'image' | 'video'>('image');
+  const [removedMediaIds, setRemovedMediaIds] = useState<string[]>([]);
 
   const resetForm = () => {
     setFormData({
@@ -62,6 +66,9 @@ export function ProductManagement() {
       long_description: '',
       media: []
     });
+    setNewMediaUrl('');
+    setNewMediaType('image');
+    setRemovedMediaIds([]);
     setEditingProduct(null);
   };
 
@@ -124,18 +131,21 @@ export function ProductManagement() {
   };
 
   const removeMedia = (index: number) => {
+    const toRemove = formData.media[index];
+    if (toRemove?.id) {
+      setRemovedMediaIds((prev) => [...prev, toRemove.id as string]);
+    }
     const updatedMedia = formData.media.filter((_, i) => i !== index);
-    setFormData({ 
-      ...formData, 
+    setFormData({
+      ...formData,
       media: updatedMedia,
-      // Update main image if we removed the current main image
       image: updatedMedia.find(m => m.media_type === 'image')?.media_url || formData.image
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const productData = {
       name: formData.name,
       price: parseFloat(formData.price),
@@ -145,23 +155,23 @@ export function ProductManagement() {
       long_description: formData.long_description
     };
 
-    let result;
-    if (editingProduct) {
-      result = await updateProduct(editingProduct, productData);
-    } else {
-      result = await addProduct(productData);
-    }
+    const result = editingProduct
+      ? await updateProduct(editingProduct, productData)
+      : await addProduct(productData);
 
     if (result.success) {
-      // Add media files if this is a new product
-      if (!editingProduct && formData.media.length > 0) {
-        // Get the created product ID from the products list
-        await fetchProducts(); // Refresh to get the new product
-        const newProduct = products.find(p => p.name === formData.name && p.price === parseFloat(formData.price));
-        if (newProduct) {
-          for (const media of formData.media) {
-            await addProductMedia(newProduct.id, media.media_url, media.media_type, media.display_order);
-          }
+      const targetProductId = editingProduct ? editingProduct : result.data?.id;
+
+      // Handle deletions when editing
+      if (editingProduct && removedMediaIds.length > 0) {
+        await Promise.all(removedMediaIds.map((id) => deleteProductMedia(id)));
+      }
+
+      // Add new media (both for create and edit)
+      if (targetProductId) {
+        const toAdd = formData.media.filter((m) => !m.id);
+        if (toAdd.length > 0) {
+          await Promise.all(toAdd.map((m) => addProductMedia(targetProductId, m.media_url, m.media_type, m.display_order)));
         }
       }
 
@@ -191,6 +201,7 @@ export function ProductManagement() {
       long_description: product.long_description || '',
       media: product.media || []
     });
+    setRemovedMediaIds([]);
     setEditingProduct(product.id);
     setIsDialogOpen(true);
   };
@@ -360,8 +371,8 @@ export function ProductManagement() {
                     />
                     {formData.image && (
                       <div className="w-full h-32 overflow-hidden rounded-lg bg-muted">
-                        <img 
-                          src={formData.image} 
+                        <img
+                          src={formData.image}
                           alt="معاينة المنتج"
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -370,6 +381,53 @@ export function ProductManagement() {
                         />
                       </div>
                     )}
+
+                    {/* Add media via URL (second, third, ...)
+                        Allows adding image or video links dynamically */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <div>
+                        <Label>نوع الرابط</Label>
+                        <Select value={newMediaType} onValueChange={(v) => setNewMediaType(v as 'image' | 'video')}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر النوع" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="image">صورة</SelectItem>
+                            <SelectItem value="video">فيديو</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label>رابط الصورة/الفيديو</Label>
+                        <Input
+                          placeholder="أدخل رابط الصورة أو الفيديو"
+                          value={newMediaUrl}
+                          onChange={(e) => setNewMediaUrl(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          if (!newMediaUrl.trim()) return;
+                          const item = {
+                            media_url: newMediaUrl.trim(),
+                            media_type: newMediaType,
+                            display_order: formData.media.length,
+                          } as ProductMedia;
+                          setFormData({
+                            ...formData,
+                            media: [...formData.media, item],
+                            image: formData.image || (newMediaType === 'image' ? newMediaUrl.trim() : formData.image)
+                          });
+                          setNewMediaUrl('');
+                        }}
+                      >
+                        إضافة الرابط
+                      </Button>
+                    </div>
                   </div>
                 </div>
                 
