@@ -99,24 +99,24 @@ const Index = () => {
               <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto shadow-soft">
                 <Store className="h-8 w-8 text-primary-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">Diverse Products</h4>
-              <p className="text-muted-foreground">All our products are carefully selected from the finest sources</p>
+              <h4 className="text-xl font-semibold text-foreground">{t('diverse.products')}</h4>
+              <p className="text-muted-foreground">{t('carefully.selected')}</p>
             </div>
             
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto shadow-soft">
                 <Phone className="h-8 w-8 text-primary-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">Excellent Customer Service</h4>
-              <p className="text-muted-foreground">Support team available to answer your inquiries</p>
+              <h4 className="text-xl font-semibold text-foreground">{t('excellent.service')}</h4>
+              <p className="text-muted-foreground">{t('support.team')}</p>
             </div>
             
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto shadow-soft">
                 <MapPin className="h-8 w-8 text-primary-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">Fast Delivery</h4>
-              <p className="text-muted-foreground">We deliver your order as quickly as possible</p>
+              <h4 className="text-xl font-semibold text-foreground">{t('fast.delivery')}</h4>
+              <p className="text-muted-foreground">{t('quick.delivery')}</p>
             </div>
           </div>
         </div>
@@ -139,7 +139,7 @@ const Index = () => {
             </div>
             
             <div>
-              <h6 className="font-semibold mb-4">Contact Us</h6>
+              <h6 className="font-semibold mb-4">{t('contact.us')}</h6>
               <div className="space-y-2 text-background/80">
                 <p className="flex items-center gap-2">
                   <Phone className="h-4 w-4" />
@@ -153,20 +153,20 @@ const Index = () => {
             </div>
             
             <div>
-              <h6 className="font-semibold mb-4">Working Hours</h6>
+              <h6 className="font-semibold mb-4">{t('working.hours')}</h6>
               <div className="space-y-1 text-background/80">
-                <p>Saturday - Thursday: 9:00 AM - 10:00 PM</p>
-                <p>Friday: 2:00 PM - 10:00 PM</p>
+                <p>{t('sat.thu')}</p>
+                <p>{t('friday')}</p>
               </div>
             </div>
           </div>
           
           <div className="border-t border-background/20 mt-8 pt-8 text-center text-background/60">
             <div className="flex items-center justify-center gap-4 mb-2">
-              <p>&copy; 2024 {t('store.name')}. All rights reserved.</p>
+              <p>&copy; 2024 {t('store.name')}. {t('all.rights')}.</p>
               <Link to="/admin/login" className="flex items-center gap-1 text-xs opacity-50 hover:opacity-80 transition-opacity">
                 <Shield className="h-3 w-3" />
-                Admin
+                {t('admin')}
               </Link>
             </div>
           </div>

@@ -49,8 +49,8 @@ const ProductDetail = () => {
             {t('back.to.home')}
           </Button>
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-foreground mb-4">Product Not Found</h2>
-            <p className="text-muted-foreground">This product is not available or has been deleted</p>
+            <h2 className="text-2xl font-bold text-foreground mb-4">{t('product.not.found')}</h2>
+            <p className="text-muted-foreground">{t('product.unavailable')}</p>
           </div>
         </div>
       </div>
@@ -229,12 +229,12 @@ const ProductDetail = () => {
             
             {/* Features */}
             <div className="card-elegant p-4">
-              <h3 className="font-semibold mb-3">Product Features:</h3>
+              <h3 className="font-semibold mb-3">{t('product.features')}:</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• High quality and excellent materials</li>
-                <li>• Full year warranty</li>
-                <li>• Free shipping within the city</li>
-                <li>• Return option within 14 days</li>
+                <li>{t('high.quality')}</li>
+                <li>{t('full.warranty')}</li>
+                <li>{t('free.shipping')}</li>
+                <li>{t('return.policy')}</li>
               </ul>
             </div>
             
@@ -285,7 +285,7 @@ const ProductDetail = () => {
                     onClick={() => navigate('/cart')}
                     size="lg"
                   >
-                    View Cart
+                    {t('view.cart')}
                   </Button>
                 </div>
                 

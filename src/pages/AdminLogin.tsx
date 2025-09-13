@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/contexts/AdminContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Lock, Mail, ArrowRight } from 'lucide-react';
 
 const AdminLogin = () => {
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,20 +54,20 @@ const AdminLogin = () => {
       <div className="absolute top-4 right-4">
         <Button variant="outline" size="sm" onClick={() => navigate('/')}>
           <ArrowRight className="h-4 w-4 ml-2" />
-          العودة للرئيسية
+          {t('back.to.home')}
         </Button>
       </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">دخول الأدمن</CardTitle>
-          <p className="text-muted-foreground">لوحة تحكم متجر الجيوسي</p>
+          <CardTitle className="text-2xl font-bold">{t('admin')} {t('login')}</CardTitle>
+          <p className="text-muted-foreground">{t('store.name')} {t('admin')}</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
-                البريد الإلكتروني
+                {t('email')}
               </Label>
               <Input
                 id="email"
@@ -80,7 +82,7 @@ const AdminLogin = () => {
             <div className="space-y-2">
               <Label htmlFor="password" className="flex items-center gap-2">
                 <Lock className="h-4 w-4" />
-                كلمة المرور
+                {t('password')}
               </Label>
               <Input
                 id="password"
@@ -88,12 +90,12 @@ const AdminLogin = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="أدخل كلمة المرور"
+                placeholder={t('enter.password')}
               />
             </div>
             
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+              {isSubmitting ? t('logging.in') : t('login')}
             </Button>
           </form>
         </CardContent>
