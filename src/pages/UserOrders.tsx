@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -30,7 +29,6 @@ interface Order {
 }
 
 const UserOrders = () => {
-  const { t } = useLanguage();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -137,24 +135,24 @@ const UserOrders = () => {
           className="mb-6"
         >
           <ArrowRight className="ml-2 h-4 w-4" />
-          {t('back.to.home')}
+          العودة للرئيسية
         </Button>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">{t('my.orders.title')}</h1>
-          <p className="text-muted-foreground">{t('all.orders.here')}</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">طلباتي</h1>
+          <p className="text-muted-foreground">جميع طلباتك في مكان واحد</p>
         </div>
 
         {orders.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
               <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">{t('no.orders')}</h3>
+              <h3 className="text-xl font-semibold mb-2">لا توجد طلبات</h3>
               <p className="text-muted-foreground mb-6">
-                {t('no.orders.yet')}
+                لم تقم بإجراء أي طلبات بعد
               </p>
               <Button onClick={() => navigate('/')}>
-                {t('browse.products')}
+                تصفح المنتجات
               </Button>
             </CardContent>
           </Card>
@@ -166,7 +164,7 @@ const UserOrders = () => {
                   <div className="flex justify-between items-start">
                     <div>
                       <CardTitle className="text-lg">
-                        {t('order.number.short')}#{order.id.slice(-8)}
+                        طلب رقم #{order.id.slice(-8)}
                       </CardTitle>
                       <p className="text-muted-foreground text-sm">
                         {formatDate(order.created_at)}
@@ -185,23 +183,23 @@ const UserOrders = () => {
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       <div>
-                        <strong>{t('name')}:</strong> {order.full_name}
+                        <strong>الاسم:</strong> {order.full_name}
                       </div>
                       <div>
-                        <strong>{t('phone')}:</strong> {order.phone_number}
+                        <strong>الهاتف:</strong> {order.phone_number}
                       </div>
                       <div className="md:col-span-2">
-                        <strong>{t('address')}:</strong> {order.address}
+                        <strong>العنوان:</strong> {order.address}
                       </div>
                       {order.notes && (
                         <div className="md:col-span-2">
-                          <strong>{t('notes')}:</strong> {order.notes}
+                          <strong>الملاحظات:</strong> {order.notes}
                         </div>
                       )}
                     </div>
 
                     <div className="border-t pt-4">
-                      <h4 className="font-semibold mb-3">{t('ordered.products')}:</h4>
+                      <h4 className="font-semibold mb-3">المنتجات المطلوبة:</h4>
                       <div className="space-y-3">
                         {order.order_items?.map((item) => (
                           <div key={item.id} className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg">
@@ -213,7 +211,7 @@ const UserOrders = () => {
                             <div className="flex-1">
                               <p className="font-medium">{item.products.name}</p>
                               <p className="text-sm text-muted-foreground">
-                                {t('quantity')}: {item.quantity} × {parseFloat(item.price.toString()).toFixed(2)} ₪
+                                الكمية: {item.quantity} × {parseFloat(item.price.toString()).toFixed(2)} ₪
                               </p>
                             </div>
                             <div className="text-left">

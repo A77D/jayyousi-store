@@ -19,7 +19,7 @@ const Index = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     // Get initial session
@@ -38,8 +38,8 @@ const Index = () => {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     toast({
-      title: "تم تسجيل الخروج بنجاح",
-      description: "نراك قريباً!",
+      title: t('logout.success.title'),
+      description: t('logout.success.description'),
     });
   };
   return <div className="min-h-screen bg-gradient-warm">
@@ -99,16 +99,16 @@ const Index = () => {
               <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto shadow-soft">
                 <Store className="h-8 w-8 text-primary-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">{t('diverse.products')}</h4>
-              <p className="text-muted-foreground">{t('carefully.selected')}</p>
+              <h4 className="text-xl font-semibold text-foreground">{t('diverse.and.many.products')}</h4>
+              <p className="text-muted-foreground">{t('all.our.products.are.carefully.selected')}</p>
             </div>
             
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto shadow-soft">
                 <Phone className="h-8 w-8 text-primary-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">{t('excellent.service')}</h4>
-              <p className="text-muted-foreground">{t('support.team')}</p>
+              <h4 className="text-xl font-semibold text-foreground">{t('excellent.customer.service')}</h4>
+              <p className="text-muted-foreground">{t('support.team.available.to.answer.inquiries')}</p>
             </div>
             
             <div className="text-center space-y-4">
@@ -116,7 +116,7 @@ const Index = () => {
                 <MapPin className="h-8 w-8 text-primary-foreground" />
               </div>
               <h4 className="text-xl font-semibold text-foreground">{t('fast.delivery')}</h4>
-              <p className="text-muted-foreground">{t('quick.delivery')}</p>
+              <p className="text-muted-foreground">{t('your.order.will.be.delivered.asap')}</p>
             </div>
           </div>
         </div>
@@ -134,7 +134,7 @@ const Index = () => {
                 <h5 className="text-xl font-bold">{t('store.name')}</h5>
               </div>
               <p className="text-background/80">
-                متجر متخصص في بيع المنتجات المتنوعة والعصرية
+                {t('store.specializing.in.selling.diverse.and.modern.products')}
               </p>
             </div>
             
@@ -155,7 +155,7 @@ const Index = () => {
             <div>
               <h6 className="font-semibold mb-4">{t('working.hours')}</h6>
               <div className="space-y-1 text-background/80">
-                <p>{t('sat.thu')}</p>
+                <p>{t('saturday.thursday')}</p>
                 <p>{t('friday')}</p>
               </div>
             </div>
@@ -163,10 +163,10 @@ const Index = () => {
           
           <div className="border-t border-background/20 mt-8 pt-8 text-center text-background/60">
             <div className="flex items-center justify-center gap-4 mb-2">
-              <p>&copy; 2024 {t('store.name')}. {t('all.rights')}.</p>
+              <p>{t('copyright')}</p>
               <Link to="/admin/login" className="flex items-center gap-1 text-xs opacity-50 hover:opacity-80 transition-opacity">
                 <Shield className="h-3 w-3" />
-                {t('admin')}
+                {t('administration')}
               </Link>
             </div>
           </div>

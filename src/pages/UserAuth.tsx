@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +10,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Lock, Mail, ArrowRight, User } from 'lucide-react';
 
 const UserAuth = () => {
-  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -109,7 +107,7 @@ const UserAuth = () => {
       <div className="absolute top-4 right-4">
         <Button variant="outline" size="sm" onClick={() => navigate('/')}>
           <ArrowRight className="h-4 w-4 ml-2" />
-          {t('back.to.home')}
+          العودة للرئيسية
         </Button>
       </div>
       
@@ -117,16 +115,16 @@ const UserAuth = () => {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
             <User className="h-6 w-6" />
-            {t('user.account')}
+            حساب العضوية
           </CardTitle>
-          <p className="text-muted-foreground">{t('store.name')}</p>
+          <p className="text-muted-foreground">متجر الجيوسي</p>
         </CardHeader>
         
         <CardContent>
           <Tabs defaultValue="login" className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">{t('login.tab')}</TabsTrigger>
-              <TabsTrigger value="signup">{t('signup.tab')}</TabsTrigger>
+              <TabsTrigger value="login">تسجيل الدخول</TabsTrigger>
+              <TabsTrigger value="signup">إنشاء حساب</TabsTrigger>
             </TabsList>
             
             <TabsContent value="login" className="space-y-4">
@@ -134,7 +132,7 @@ const UserAuth = () => {
                 <div className="space-y-2">
                   <Label htmlFor="login-email" className="flex items-center gap-2">
                     <Mail className="h-4 w-4" />
-                    {t('email')}
+                    البريد الإلكتروني
                   </Label>
                   <Input
                     id="login-email"
@@ -149,7 +147,7 @@ const UserAuth = () => {
                 <div className="space-y-2">
                   <Label htmlFor="login-password" className="flex items-center gap-2">
                     <Lock className="h-4 w-4" />
-                    {t('password')}
+                    كلمة المرور
                   </Label>
                   <Input
                     id="login-password"
@@ -157,12 +155,12 @@ const UserAuth = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={t('enter.password')}
+                    placeholder="أدخل كلمة المرور"
                   />
                 </div>
                 
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? t('logging.in') : t('login')}
+                  {isSubmitting ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
                 </Button>
               </form>
             </TabsContent>
@@ -172,7 +170,7 @@ const UserAuth = () => {
                 <div className="space-y-2">
                   <Label htmlFor="signup-email" className="flex items-center gap-2">
                     <Mail className="h-4 w-4" />
-                    {t('email')}
+                    البريد الإلكتروني
                   </Label>
                   <Input
                     id="signup-email"
@@ -187,7 +185,7 @@ const UserAuth = () => {
                 <div className="space-y-2">
                   <Label htmlFor="signup-password" className="flex items-center gap-2">
                     <Lock className="h-4 w-4" />
-                    {t('password')}
+                    كلمة المرور
                   </Label>
                   <Input
                     id="signup-password"
@@ -195,14 +193,14 @@ const UserAuth = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={t('enter.password')}
+                    placeholder="أدخل كلمة المرور"
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="confirm-password" className="flex items-center gap-2">
                     <Lock className="h-4 w-4" />
-                    {t('confirm.password')}
+                    تأكيد كلمة المرور
                   </Label>
                   <Input
                     id="confirm-password"
@@ -210,12 +208,12 @@ const UserAuth = () => {
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder={t('reenter.password')}
+                    placeholder="أعد إدخال كلمة المرور"
                   />
                 </div>
                 
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? t('creating.account') : t('signup')}
+                  {isSubmitting ? "جاري إنشاء الحساب..." : "إنشاء حساب"}
                 </Button>
               </form>
             </TabsContent>

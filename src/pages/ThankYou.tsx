@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -30,7 +29,6 @@ interface OrderDetails {
 
 const ThankYou = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -108,8 +106,8 @@ const ThankYou = () => {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">{t('thank.you.order')}</h1>
-            <p className="text-muted-foreground text-lg">{t('order.received')}</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">شكراً لك على طلبك!</h1>
+            <p className="text-muted-foreground text-lg">تم استلام طلبك بنجاح وسيتم التواصل معك قريباً</p>
           </div>
 
           {orderDetails && (
@@ -119,22 +117,22 @@ const ThankYou = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <ShoppingBag className="h-5 w-5" />
-                    {t('order.details')}
+                    تفاصيل الطلب
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('order.number')}:</span>
+                    <span className="text-muted-foreground">رقم الطلب:</span>
                     <span className="font-mono font-semibold">#{orderDetails.id.slice(-8)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('order.date')}:</span>
+                    <span className="text-muted-foreground">تاريخ الطلب:</span>
                     <span>{formatDate(orderDetails.created_at)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('order.status')}:</span>
+                    <span className="text-muted-foreground">حالة الطلب:</span>
                     <Badge variant="secondary">
-                      {orderDetails.status === 'pending' ? t('under.review') : orderDetails.status}
+                      {orderDetails.status === 'pending' ? 'قيد المراجعة' : orderDetails.status}
                     </Badge>
                   </div>
                 </CardContent>
@@ -143,7 +141,7 @@ const ThankYou = () => {
               {/* Order Items */}
               <Card>
                 <CardHeader>
-                  <CardTitle>{t('ordered.products')}</CardTitle>
+                  <CardTitle>المنتجات المطلوبة</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -171,7 +169,7 @@ const ThankYou = () => {
                     <Separator />
                     
                     <div className="flex justify-between items-center pt-2">
-                      <span className="text-lg font-bold">{t('grand.total')}:</span>
+                      <span className="text-lg font-bold">المجموع الكلي:</span>
                       <span className="text-2xl font-bold text-primary">
                         {orderDetails.total_price.toFixed(2)} ₪
                       </span>
@@ -185,7 +183,7 @@ const ThankYou = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Truck className="h-5 w-5" />
-                    {t('delivery.information')}
+                    معلومات التوصيل
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -205,7 +203,7 @@ const ThankYou = () => {
                   {orderDetails.notes && (
                     <div className="bg-muted/50 p-3 rounded-lg">
                       <p className="text-sm">
-                        <span className="font-semibold">{t('notes')}:</span> {orderDetails.notes}
+                        <span className="font-semibold">ملاحظات:</span> {orderDetails.notes}
                       </p>
                     </div>
                   )}
@@ -216,11 +214,11 @@ const ThankYou = () => {
               <Card>
                 <CardContent className="pt-6">
                   <div className="text-center space-y-4">
-                    <h3 className="text-lg font-semibold">{t('what.next')}</h3>
+                    <h3 className="text-lg font-semibold">ماذا بعد؟</h3>
                     <div className="text-muted-foreground space-y-2">
-                      <p>{t('order.review.process')}</p>
-                      <p>{t('contact.within.24h')}</p>
-                      <p>{t('prepare.deliver')}</p>
+                      <p>• سيتم مراجعة طلبك والتأكد من توفر المنتجات</p>
+                      <p>• سنتواصل معك خلال 24 ساعة لتأكيد الطلب</p>
+                      <p>• بعد التأكيد، سيتم تحضير الطلب وتوصيله إليك</p>
                     </div>
                   </div>
                 </CardContent>
@@ -234,7 +232,7 @@ const ThankYou = () => {
                   size="lg"
                 >
                   <Home className="ml-2 h-5 w-5" />
-                  {t('continue.shopping')}
+                  متابعة التسوق
                 </Button>
                 <Button 
                   onClick={() => window.location.href = `tel:+970594321456`}
@@ -242,7 +240,7 @@ const ThankYou = () => {
                   size="lg"
                 >
                   <Phone className="ml-2 h-5 w-5" />
-                  {t('call.us')}
+                  اتصل بنا
                 </Button>
               </div>
             </div>
