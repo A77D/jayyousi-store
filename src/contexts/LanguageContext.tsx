@@ -5,7 +5,7 @@ type Language = 'ar' | 'en' | 'he';
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: object) => string;
 }
 
 const translations = {
@@ -33,6 +33,8 @@ const translations = {
     'add.to.cart': 'إضافة للسلة',
     'quantity': 'الكمية',
     'total': 'المجموع',
+    'add.to.cart.success.title': 'تمت إضافة المنتج للسلة',
+    'add.to.cart.success.description': 'تم إضافة {quantity} من {name} إلى سلة التسوق',
     
     // Cart
     'shopping.cart': 'سلة التسوق',
@@ -44,6 +46,31 @@ const translations = {
     'order.summary': 'ملخص الطلب',
     'grand.total': 'المجموع الكلي',
     'checkout': 'إتمام الطلب',
+
+    // Checkout
+    'back.to.cart': 'العودة للسلة',
+    'delivery.information': 'معلومات التوصيل',
+    'full.name': 'الاسم الكامل',
+    'enter.full.name': 'أدخل اسمك الكامل',
+    'phone.number': 'رقم الهاتف',
+    'phone.number.placeholder': '+970-xxx-xxx-xxx',
+    'delivery.zone': 'منطقة التوصيل',
+    'choose.delivery.zone': 'اختر منطقة التوصيل',
+    'detailed.delivery.address': 'عنوان التوصيل التفصيلي',
+    'enter.detailed.address': 'أدخل العنوان الكامل مع تفاصيل الموقع',
+    'additional.notes.optional': 'ملاحظات إضافية (اختياري)',
+    'any.special.notes': 'أي ملاحظات أو طلبات خاصة',
+    'confirm.order': 'تأكيد الطلب',
+    'subtotal': 'المجموع الفرعي',
+    'delivery.fee': 'رسوم التوصيل',
+    'select.zone': 'اختر المنطقة',
+    'west.bank': 'الضفة الغربية',
+    'jerusalem': 'القدس',
+    'occupied.interior': 'الداخل المحتل',
+    'order.success.title': 'تم إرسال الطلب بنجاح',
+    'order.success.description': 'سيتم التواصل معك قريباً لتأكيد الطلب',
+    'order.error.title': 'خطأ في إرسال الطلب',
+    'order.error.description': 'حدث خطأ غير متوقع',
     
     // Common
     'back.to.home': 'العودة للرئيسية',
@@ -90,7 +117,9 @@ const translations = {
     'add.to.cart': 'Add to Cart',
     'quantity': 'Quantity',
     'total': 'Total',
-    
+    'add.to.cart.success.title': 'Product added to cart',
+    'add.to.cart.success.description': '{quantity} of {name} have been added to your cart',
+
     // Cart
     'shopping.cart': 'Shopping Cart',
     'cart.empty': 'Cart is Empty',
@@ -102,6 +131,31 @@ const translations = {
     'grand.total': 'Grand Total',
     'checkout': 'Checkout',
     
+    // Checkout
+    'back.to.cart': 'Back to Cart',
+    'delivery.information': 'Delivery Information',
+    'full.name': 'Full Name',
+    'enter.full.name': 'Enter your full name',
+    'phone.number': 'Phone Number',
+    'phone.number.placeholder': '+970-xxx-xxx-xxx',
+    'delivery.zone': 'Delivery Zone',
+    'choose.delivery.zone': 'Choose delivery zone',
+    'detailed.delivery.address': 'Detailed Delivery Address',
+    'enter.detailed.address': 'Enter the full address with location details',
+    'additional.notes.optional': 'Additional Notes (Optional)',
+    'any.special.notes': 'Any special notes or requests',
+    'confirm.order': 'Confirm Order',
+    'subtotal': 'Subtotal',
+    'delivery.fee': 'Delivery Fee',
+    'select.zone': 'Select zone',
+    'west.bank': 'West Bank',
+    'jerusalem': 'Jerusalem',
+    'occupied.interior': 'Occupied Interior',
+    'order.success.title': 'Order submitted successfully',
+    'order.success.description': 'We will contact you shortly to confirm your order',
+    'order.error.title': 'Error submitting order',
+    'order.error.description': 'An unexpected error occurred',
+
     // Common
     'back.to.home': 'Back to Home',
     'phone': 'Phone',
@@ -147,6 +201,8 @@ const translations = {
     'add.to.cart': 'הוסף לעגלה',
     'quantity': 'כמות',
     'total': 'סה"כ',
+    'add.to.cart.success.title': 'המוצר נוסף לעגלה',
+    'add.to.cart.success.description': '{quantity} מ-{name} נוספו לעגלת הקניות שלך',
     
     // Cart
     'shopping.cart': 'עגלת קניות',
@@ -158,6 +214,31 @@ const translations = {
     'order.summary': 'סיכום הזמנה',
     'grand.total': 'סה"כ כללי',
     'checkout': 'לתשלום',
+
+    // Checkout
+    'back.to.cart': 'חזור לעגלה',
+    'delivery.information': 'פרטי משלוח',
+    'full.name': 'שם מלא',
+    'enter.full.name': 'הכנס את שמך המלא',
+    'phone.number': 'מספר טלפון',
+    'phone.number.placeholder': '+970-xxx-xxx-xxx',
+    'delivery.zone': 'אזור משלוח',
+    'choose.delivery.zone': 'בחר אזור משלוח',
+    'detailed.delivery.address': 'כתובת למשלוח מפורטת',
+    'enter.detailed.address': 'הזן את הכתובת המלאה עם פרטי מיקום',
+    'additional.notes.optional': 'הערות נוספות (אופציונלי)',
+    'any.special.notes': 'הערות או בקשות מיוחדות',
+    'confirm.order': 'אשר הזמנה',
+    'subtotal': 'סכום ביניים',
+    'delivery.fee': 'דמי משלוח',
+    'select.zone': 'בחר אזור',
+    'west.bank': 'הגדה המערבית',
+    'jerusalem': 'ירושלים',
+    'occupied.interior': 'הפנים הכבוש',
+    'order.success.title': 'ההזמנה נשלחה בהצלחה',
+    'order.success.description': 'ניצור עמך קשר בהקדם לאישור ההזמנה',
+    'order.error.title': 'שגיאה בשליחת ההזמנה',
+    'order.error.description': 'אירעה שגיאה בלתי צפויה',
     
     // Common
     'back.to.home': 'חזור לעמוד הבית',
@@ -196,8 +277,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.dir = language === 'ar' || language === 'he' ? 'rtl' : 'ltr';
   }, [language]);
 
-  const t = (key: string): string => {
-    return translations[language][key] || key;
+  const t = (key: string, params?: object): string => {
+    let translation = translations[language][key] || key;
+    if (params) {
+      for (const [paramKey, paramValue] of Object.entries(params)) {
+        translation = translation.replace(`{${paramKey}}`, String(paramValue));
+      }
+    }
+    return translation;
   };
 
   const value = {

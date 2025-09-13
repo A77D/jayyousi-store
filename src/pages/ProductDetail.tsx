@@ -66,11 +66,17 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     addItem(product, quantity);
     toast({
-      title: "تمت إضافة المنتج للسلة",
-      description: `تم إضافة ${quantity} من ${product.name} إلى سلة التسوق`,
+      title: t('add.to.cart.success.title'),
+      description: t('add.to.cart.success.description', { quantity, name: product.name }),
     });
   };
   
+  // Combine main image with other media for the carousel
+  const allMedia = [ 
+    { id: 'main', media_url: product.image, media_type: 'image', display_order: 0 }, 
+    ...(product.media || []) 
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-warm">
       <Header />
@@ -89,126 +95,78 @@ const ProductDetail = () => {
           {/* Product Images and Videos */}
           <div className="space-y-4">
             {/* Media Gallery */}
-            {product.media && product.media.length > 0 ? (
-              <Carousel className="w-full">
-                <CarouselContent>
-                  {/* Main product image first */}
-                  <CarouselItem>
-                    <div className="aspect-square overflow-hidden rounded-lg bg-background">
-                      <img 
-                        src={product.image} 
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </CarouselItem>
-                  
-                  {/* Additional media */}
-                  {product.media
-                    .sort((a, b) => a.display_order - b.display_order)
-                    .map((media, index) => (
-                      <CarouselItem key={media.id || index}>
-                        <div className="aspect-square overflow-hidden rounded-lg bg-muted relative">
-                          {media.media_type === 'image' ? (
-                            <img 
-                              src={media.media_url} 
-                              alt={`${product.name} - Image ${index + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <>
-                              <video 
-                                src={media.media_url}
-                                className="w-full h-full object-cover"
-                                controls
-                                preload="metadata"
-                              />
-                              <div className="absolute top-2 left-2 bg-black bg-opacity-50 rounded p-1">
-                                <Play className="h-4 w-4 text-white" />
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </CarouselItem>
-                    ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
-            ) : (
-              /* Fallback to main image only */
-              <div className="aspect-square overflow-hidden rounded-lg bg-background">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-            
-            {/* Thumbnail grid for additional media */}
-            {product.media && product.media.length > 0 && (
-              <div className="grid grid-cols-3 gap-4">
-                <div className="aspect-square overflow-hidden rounded-lg bg-muted border-2 border-primary">
-                  <img 
-                    src={product.image} 
-                    alt={`${product.name} - Main`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                {product.media
+            <Carousel className="w-full">
+              <CarouselContent>
+                {allMedia
                   .sort((a, b) => a.display_order - b.display_order)
-                  .slice(0, 2)
                   .map((media, index) => (
-                    <div key={media.id || index} className="aspect-square overflow-hidden rounded-lg bg-muted relative cursor-pointer hover:opacity-80 transition-opacity">
-                      {media.media_type === 'image' ? (
-                        <>
+                    <CarouselItem key={media.id || index}>
+                      <div className="aspect-square overflow-hidden rounded-lg bg-muted relative">
+                        {media.media_type === 'image' ? (
                           <img 
                             src={media.media_url} 
-                            alt={`${product.name} - Thumbnail ${index + 1}`}
+                            alt={`${product.name} - Image ${index + 1}`}
                             className="w-full h-full object-cover"
                           />
-                          <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 rounded p-1">
-                            <ImageIcon className="h-3 w-3 text-white" />
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <video 
-                            src={media.media_url}
-                            className="w-full h-full object-cover"
-                            muted
-                            preload="metadata"
-                          />
-                          <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 rounded p-1">
-                            <Play className="h-3 w-3 text-white" />
-                          </div>
-                        </>
-                      )}
-                    </div>
+                        ) : (
+                          <>
+                            <video 
+                              src={media.media_url}
+                              className="w-full h-full object-cover"
+                              controls
+                              preload="metadata"
+                            />
+                            <div className="absolute top-2 left-2 bg-black bg-opacity-50 rounded p-1">
+                              <Play className="h-4 w-4 text-white" />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </CarouselItem>
                   ))}
-                {product.media.length > 2 && (
-                  <div className="aspect-square overflow-hidden rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
-                    +{product.media.length - 2} more
-                  </div>
-                )}
-              </div>
-            )}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
             
-            {/* Fallback grid when no additional media */}
-            {(!product.media || product.media.length === 0) && (
-              <div className="grid grid-cols-3 gap-4">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className={`aspect-square overflow-hidden rounded-lg bg-muted ${i === 0 ? 'border-2 border-primary' : ''}`}>
-                    <img 
-                      src={product.image} 
-                      alt={`${product.name} - Image ${i + 1}`}
-                      className={`w-full h-full object-cover ${i === 0 ? '' : 'opacity-70'}`}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Thumbnail grid */}
+            <div className="grid grid-cols-4 gap-4">
+              {allMedia.slice(0, 4).map((media, index) => (
+                <div key={media.id || index} className={`aspect-square overflow-hidden rounded-lg bg-muted relative cursor-pointer hover:opacity-80 transition-opacity ${index === 0 ? 'border-2 border-primary' : ''}`}>
+                  {media.media_type === 'image' ? (
+                    <>
+                      <img 
+                        src={media.media_url} 
+                        alt={`${product.name} - Thumbnail ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      {index > 0 && (
+                        <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 rounded p-1">
+                          <ImageIcon className="h-3 w-3 text-white" />
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <video 
+                        src={media.media_url}
+                        className="w-full h-full object-cover"
+                        muted
+                        preload="metadata"
+                      />
+                      <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 rounded p-1">
+                        <Play className="h-3 w-3 text-white" />
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+              {allMedia.length > 4 && (
+                <div className="aspect-square overflow-hidden rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
+                  +{allMedia.length - 4} more
+                </div>
+              )}
+            </div>
           </div>
           
           {/* Product Details */}
