@@ -53,7 +53,7 @@ export function ProductManagement() {
     short_description: '',
     long_description: '',
     media: [],
-    mediaUrls: ['']
+    mediaUrls: ['', '', ''] // Start with 3 empty URL fields
   });
 
   const resetForm = () => {
@@ -65,7 +65,7 @@ export function ProductManagement() {
       short_description: '',
       long_description: '',
       media: [],
-      mediaUrls: ['']
+      mediaUrls: ['', '', ''] // Reset with 3 empty URL fields
     });
     setEditingProduct(null);
   };
@@ -78,7 +78,7 @@ export function ProductManagement() {
   };
 
   const removeMediaUrl = (index: number) => {
-    if (formData.mediaUrls.length > 1) {
+    if (formData.mediaUrls.length > 3) { // Keep minimum 3 fields
       const updatedUrls = formData.mediaUrls.filter((_, i) => i !== index);
       setFormData({
         ...formData,
@@ -242,7 +242,7 @@ export function ProductManagement() {
 
       toast({
         title: editingProduct ? "تم تحديث المنتج" : "تم إضافة المنتج",
-        description: "تم حفظ البيانات بنجاح"
+        description: editingProduct ? "تم تحديث المنتج وجميع الصور والفيديوهات بنجاح" : "تم إضافة المنتج وجميع الصور والفيديوهات بنجاح"
       });
       setIsDialogOpen(false);
       resetForm();
@@ -265,7 +265,7 @@ export function ProductManagement() {
       short_description: product.short_description || '',
       long_description: product.long_description || '',
       media: product.media || [],
-      mediaUrls: ['']
+      mediaUrls: ['', '', ''] // Reset with 3 empty fields for editing
     });
     setEditingProduct(product.id);
     setIsDialogOpen(true);
@@ -354,18 +354,18 @@ export function ProductManagement() {
                 <div className="space-y-2">
                   <Label>الصور والفيديوهات</Label>
                   <div className="space-y-3">
-                    {/* URL-based media inputs */}
+                    {/* روابط الصور والفيديوهات */}
                     <div className="space-y-3">
-                      <Label className="text-sm font-medium">{t('image.video.links')}</Label>
+                      <Label className="text-sm font-medium">روابط الصور والفيديوهات</Label>
                       {formData.mediaUrls.map((url, index) => (
                         <div key={index} className="flex gap-2">
                           <Input
-                            placeholder={`${t('image.video.link')} ${index + 1}`}
+                            placeholder={`رابط الصورة أو الفيديو ${index + 1}`}
                             value={url}
                             onChange={(e) => updateMediaUrl(index, e.target.value)}
                             className="flex-1"
                           />
-                          {formData.mediaUrls.length > 1 && (
+                          {formData.mediaUrls.length > 3 && index >= 3 && (
                             <Button
                               type="button"
                               variant="outline"
@@ -384,11 +384,11 @@ export function ProductManagement() {
                         className="w-full"
                       >
                         <Plus className="ml-2 h-4 w-4" />
-                        {t('add.another.link')}
+                        إضافة رابط آخر
                       </Button>
                     </div>
 
-                    <div className="text-center text-sm text-muted-foreground">{t('or')}</div>
+                    <div className="text-center text-sm text-muted-foreground">أو</div>
 
                     {/* File upload section */}
                     <div className="flex gap-2">
@@ -468,7 +468,7 @@ export function ProductManagement() {
                     {/* Preview URL-based media */}
                     {formData.mediaUrls.some(url => url.trim() !== '') && (
                       <div className="space-y-3">
-                        <Label className="text-sm font-medium">{t('link.preview')}</Label>
+                        <Label className="text-sm font-medium">معاينة الروابط</Label>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 border rounded-lg">
                           {formData.mediaUrls
                             .filter(url => url.trim() !== '')
@@ -514,7 +514,7 @@ export function ProductManagement() {
                       </div>
                     )}
                     <Input
-                      placeholder={t('main.image.link')}
+                      placeholder="رابط الصورة الرئيسية"
                       value={formData.image}
                       onChange={(e) => setFormData({...formData, image: e.target.value})}
                     />
@@ -522,7 +522,7 @@ export function ProductManagement() {
                       <div className="w-full h-32 overflow-hidden rounded-lg bg-muted">
                         <img 
                           src={formData.image} 
-                          alt={t('product.preview')}
+                          alt="معاينة المنتج"
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             e.currentTarget.src = '/placeholder.svg';

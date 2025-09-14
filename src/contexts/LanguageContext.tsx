@@ -94,14 +94,18 @@ const translations = {
     'administration': 'إدارة',
     
     // Admin panel
-    'add.another.link': 'إضافة رابط آخر',
-    'image.video.links': 'روابط الصور والفيديوهات',
-    'image.video.link': 'رابط الصورة أو الفيديو',
-    'link.preview': 'معاينة الروابط',
-    'main.image': 'الصورة الرئيسية',
-    'main.image.link': 'رابط الصورة الرئيسية',
-    'or': 'أو',
-    'product.preview': 'معاينة المنتج',
+    'add.another.link': 'إضافة رابط آخر للصورة أو الفيديو',
+    'image.video.links': 'روابط الصور والفيديوهات الإضافية',
+    'image.video.link': 'رابط الصورة أو الفيديو رقم',
+    'link.preview': 'معاينة جميع الروابط المضافة',
+    'main.image': 'الصورة الرئيسية للمنتج',
+    'main.image.link': 'رابط الصورة الرئيسية (مطلوب)',
+    'or': 'أو يمكنك',
+    'product.preview': 'معاينة المنتج النهائية',
+    'second.image.link': 'رابط الصورة الثانية',
+    'third.image.link': 'رابط الصورة الثالثة',
+    'additional.media': 'صور وفيديوهات إضافية',
+    'upload.files.or.links': 'رفع ملفات أو إضافة روابط',
   },
   en: {
     // Header
@@ -188,14 +192,18 @@ const translations = {
     'administration': 'Administration',
     
     // Admin panel
-    'add.another.link': 'Add Another Link',
-    'image.video.links': 'Image & Video Links',
-    'image.video.link': 'Image or Video Link',
-    'link.preview': 'Link Preview',
-    'main.image': 'Main Image',
-    'main.image.link': 'Main Image Link',
-    'or': 'or',
-    'product.preview': 'Product Preview',
+    'add.another.link': 'Add Another Image or Video Link',
+    'image.video.links': 'Additional Image & Video Links',
+    'image.video.link': 'Image or Video Link #',
+    'link.preview': 'Preview All Added Links',
+    'main.image': 'Main Product Image',
+    'main.image.link': 'Main Image Link (Required)',
+    'or': 'or you can',
+    'product.preview': 'Final Product Preview',
+    'second.image.link': 'Second Image Link',
+    'third.image.link': 'Third Image Link',
+    'additional.media': 'Additional Images & Videos',
+    'upload.files.or.links': 'Upload Files or Add Links',
   },
   he: {
     // Header
@@ -282,14 +290,18 @@ const translations = {
     'administration': 'הנהלה',
     
     // Admin panel
-    'add.another.link': 'הוסף קישור נוסף',
-    'image.video.links': 'קישורי תמונות וסרטונים',
-    'image.video.link': 'קישור תמונה או סרטון',
-    'link.preview': 'תצוגה מקדימה של קישורים',
-    'main.image': 'תמונה ראשית',
-    'main.image.link': 'קישור תמונה ראשית',
-    'or': 'או',
-    'product.preview': 'תצוגה מקדימה של המוצר',
+    'add.another.link': 'הוסף קישור נוסף לתמונה או סרטון',
+    'image.video.links': 'קישורי תמונות וסרטונים נוספים',
+    'image.video.link': 'קישור תמונה או סרטון מס\'',
+    'link.preview': 'תצוגה מקדימה של כל הקישורים',
+    'main.image': 'תמונה ראשית של המוצר',
+    'main.image.link': 'קישור תמונה ראשית (נדרש)',
+    'or': 'או שאתה יכול',
+    'product.preview': 'תצוגה מקדימה סופית של המוצר',
+    'second.image.link': 'קישור תמונה שנייה',
+    'third.image.link': 'קישור תמונה שלישית',
+    'additional.media': 'תמונות וסרטונים נוספים',
+    'upload.files.or.links': 'העלה קבצים או הוסף קישורים',
   }
 };
 
