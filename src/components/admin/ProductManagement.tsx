@@ -629,5 +629,3 @@ export function ProductManagement() {
     </Card>
   );
 }
-
-                    <div className="text-center text-sm text-muted-foreground">{t('main.image')}</div>
