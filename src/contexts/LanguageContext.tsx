@@ -92,6 +92,20 @@ const translations = {
     'friday': 'الجمعة: 2:00 م - 10:00 م',
     'copyright': '© 2024 متجر الجيوسي. جميع الحقوق محفوظة',
     'administration': 'إدارة',
+    
+    // Admin panel
+    'add.another.link': 'إضافة رابط آخر للصورة أو الفيديو',
+    'image.video.links': 'روابط الصور والفيديوهات الإضافية',
+    'image.video.link': 'رابط الصورة أو الفيديو رقم',
+    'link.preview': 'معاينة جميع الروابط المضافة',
+    'main.image': 'الصورة الرئيسية للمنتج',
+    'main.image.link': 'رابط الصورة الرئيسية (مطلوب)',
+    'or': 'أو يمكنك',
+    'product.preview': 'معاينة المنتج النهائية',
+    'second.image.link': 'رابط الصورة الثانية',
+    'third.image.link': 'رابط الصورة الثالثة',
+    'additional.media': 'صور وفيديوهات إضافية',
+    'upload.files.or.links': 'رفع ملفات أو إضافة روابط',
   },
   en: {
     // Header
@@ -176,6 +190,20 @@ const translations = {
     'friday': 'Friday: 2:00 PM - 10:00 PM',
     'copyright': '© 2024 Jayyousi Store. All rights reserved',
     'administration': 'Administration',
+    
+    // Admin panel
+    'add.another.link': 'Add Another Image or Video Link',
+    'image.video.links': 'Additional Image & Video Links',
+    'image.video.link': 'Image or Video Link #',
+    'link.preview': 'Preview All Added Links',
+    'main.image': 'Main Product Image',
+    'main.image.link': 'Main Image Link (Required)',
+    'or': 'or you can',
+    'product.preview': 'Final Product Preview',
+    'second.image.link': 'Second Image Link',
+    'third.image.link': 'Third Image Link',
+    'additional.media': 'Additional Images & Videos',
+    'upload.files.or.links': 'Upload Files or Add Links',
   },
   he: {
     // Header
@@ -260,6 +288,20 @@ const translations = {
     'friday': 'שישי: 14:00 - 22:00',
     'copyright': '© 2024 חנות ג\'יוסי. כל הזכויות שמורות',
     'administration': 'הנהלה',
+    
+    // Admin panel
+    'add.another.link': 'הוסף קישור נוסף לתמונה או סרטון',
+    'image.video.links': 'קישורי תמונות וסרטונים נוספים',
+    'image.video.link': 'קישור תמונה או סרטון מס\'',
+    'link.preview': 'תצוגה מקדימה של כל הקישורים',
+    'main.image': 'תמונה ראשית של המוצר',
+    'main.image.link': 'קישור תמונה ראשית (נדרש)',
+    'or': 'או שאתה יכול',
+    'product.preview': 'תצוגה מקדימה סופית של המוצר',
+    'second.image.link': 'קישור תמונה שנייה',
+    'third.image.link': 'קישור תמונה שלישית',
+    'additional.media': 'תמונות וסרטונים נוספים',
+    'upload.files.or.links': 'העלה קבצים או הוסף קישורים',
   }
 };
 
